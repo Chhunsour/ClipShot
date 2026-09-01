@@ -2,6 +2,26 @@ import Foundation
 import AppKit
 import SwiftUI
 
+public enum SettingsTab: String, CaseIterable, Identifiable, Hashable {
+    case general = "General"
+    case screenshots = "Screenshots"
+    case clipboard = "Clipboard"
+    case preview = "Preview"
+    case clipNotch = "ClipNotch"
+    case history = "History"
+    case shortcuts = "Shortcuts"
+    case permissions = "Permissions"
+    case advanced = "Advanced"
+    case about = "About"
+
+    public var id: String { rawValue }
+}
+
+public final class SettingsNavigationState: ObservableObject {
+    public static let shared = SettingsNavigationState()
+    @Published public var selectedTab: SettingsTab = .clipNotch
+}
+
 public final class SettingsWindowController: NSWindowController {
     public static let shared = SettingsWindowController()
 
@@ -27,7 +47,8 @@ public final class SettingsWindowController: NSWindowController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public func showSettings() {
+    public func showSettings(tab: SettingsTab = .clipNotch) {
+        SettingsNavigationState.shared.selectedTab = tab
         showWindow(nil)
         window?.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
@@ -38,38 +59,51 @@ public struct SettingsView: View {
     @ObservedObject private var settings = AppSettings.shared
     @ObservedObject private var launchManager = LaunchAtLoginManager.shared
     @ObservedObject private var permissionsManager = PermissionsManager.shared
+    @ObservedObject private var navState = SettingsNavigationState.shared
+
+    public init() {}
 
     public var body: some View {
-        TabView {
+        TabView(selection: $navState.selectedTab) {
             GeneralSettingsTab(settings: settings, launchManager: launchManager)
                 .tabItem { Label("General", systemImage: "gearshape") }
+                .tag(SettingsTab.general)
 
             ScreenshotsSettingsTab(settings: settings)
                 .tabItem { Label("Screenshots", systemImage: "camera") }
+                .tag(SettingsTab.screenshots)
 
             ClipboardSettingsTab(settings: settings)
                 .tabItem { Label("Clipboard", systemImage: "doc.on.clipboard") }
+                .tag(SettingsTab.clipboard)
 
             PreviewSettingsTab(settings: settings)
                 .tabItem { Label("Preview", systemImage: "macwindow.badge.plus") }
+                .tag(SettingsTab.preview)
 
             ClipNotchSettingsView()
                 .tabItem { Label("ClipNotch", systemImage: "sparkles.tv") }
+                .tag(SettingsTab.clipNotch)
 
             HistorySettingsTab(settings: settings)
                 .tabItem { Label("History", systemImage: "clock") }
+                .tag(SettingsTab.history)
 
             ShortcutsSettingsTab()
                 .tabItem { Label("Shortcuts", systemImage: "keyboard") }
+                .tag(SettingsTab.shortcuts)
 
             PermissionsTab(permissions: permissionsManager)
                 .tabItem { Label("Permissions", systemImage: "lock.shield") }
+                .tag(SettingsTab.permissions)
 
             AdvancedSettingsTab(settings: settings)
                 .tabItem { Label("Advanced", systemImage: "slider.horizontal.3") }
+                .tag(SettingsTab.advanced)
 
             AboutSettingsTab()
                 .tabItem { Label("About", systemImage: "info.circle") }
+                .tag(SettingsTab.about)
         }
         .padding(16)
         .frame(width: 580, height: 440)

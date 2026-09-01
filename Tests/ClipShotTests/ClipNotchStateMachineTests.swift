@@ -99,12 +99,18 @@ final class ClipNotchStateMachineTests: XCTestCase {
     }
 
     func testIdleNotchSizesAreTwelvePercentLarger() {
-        XCTAssertEqual(ClipNotchSize.compact.idleDimensions.width, 198 * 1.12, accuracy: 0.001)
+        XCTAssertEqual(ClipNotchSize.compact.idleDimensions.width, 184 * 1.12, accuracy: 0.001)
         XCTAssertEqual(ClipNotchSize.compact.idleDimensions.height, 34 * 1.12, accuracy: 0.001)
-        XCTAssertEqual(ClipNotchSize.normal.idleDimensions.width, 244 * 1.12, accuracy: 0.001)
+        XCTAssertEqual(ClipNotchSize.normal.idleDimensions.width, 224 * 1.12, accuracy: 0.001)
         XCTAssertEqual(ClipNotchSize.normal.idleDimensions.height, 36 * 1.12, accuracy: 0.001)
         XCTAssertEqual(ClipNotchSize.large.idleDimensions.width, 260 * 1.12, accuracy: 0.001)
         XCTAssertEqual(ClipNotchSize.large.idleDimensions.height, 38 * 1.12, accuracy: 0.001)
+        XCTAssertEqual(ClipNotchSize.extraLarge.idleDimensions.width, 310 * 1.12, accuracy: 0.001)
+        XCTAssertEqual(ClipNotchSize.extraLarge.idleDimensions.height, 41 * 1.12, accuracy: 0.001)
+        XCTAssertEqual(ClipNotchSize.ultraWide.idleDimensions.width, 390 * 1.12, accuracy: 0.001)
+        XCTAssertEqual(ClipNotchSize.ultraWide.idleDimensions.height, 43 * 1.12, accuracy: 0.001)
+        XCTAssertEqual(ClipNotchSize.studio.idleDimensions.width, 480 * 1.12, accuracy: 0.001)
+        XCTAssertEqual(ClipNotchSize.studio.idleDimensions.height, 45 * 1.12, accuracy: 0.001)
     }
 
     func testPresentationKindStabilityAcrossUpdates() {

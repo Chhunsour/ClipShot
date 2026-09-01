@@ -22,20 +22,40 @@ public struct ClipNotchView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .animation(
-            reduceMotion ? nil : .spring(response: 0.42, dampingFraction: 0.88, blendDuration: 0.05),
+            reduceMotion ? nil : .spring(
+                response: settings.clipNotchMotion.springResponse,
+                dampingFraction: settings.clipNotchMotion.springDampingFraction,
+                blendDuration: 0.04
+            ),
             value: viewModel.currentState.presentationKind
         )
         .background(notchBackground)
         .clipShape(notchClipShape)
         .overlay {
-            if settings.clipNotchPlacementMode == .floatingIsland {
+            let finish = settings.clipNotchFinish
+            let colorway = settings.clipNotchColorway
+            if finish == .neonAura {
                 notchClipShape
-                    .stroke(Color.white.opacity(0.14), lineWidth: 0.75)
+                    .stroke(
+                        LinearGradient(
+                            colors: colorway.colors,
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        ),
+                        lineWidth: 1.0
+                    )
+            } else if settings.clipNotchPlacementMode == .floatingIsland {
+                notchClipShape
+                    .stroke(Color.white.opacity(finish.specularFloatingBorderOpacity), lineWidth: 0.75)
             } else {
                 notchClipShape
                     .stroke(
                         LinearGradient(
-                            colors: [Color.white.opacity(0.0), Color.white.opacity(0.06), Color.white.opacity(0.1)],
+                            colors: [
+                                Color.white.opacity(0.0),
+                                Color.white.opacity(finish.specularBorderOpacity),
+                                Color.white.opacity(finish.specularBorderOpacity * 1.6)
+                            ],
                             startPoint: .top,
                             endPoint: .bottom
                         ),
@@ -44,10 +64,10 @@ public struct ClipNotchView: View {
             }
         }
         .shadow(
-            color: settings.clipNotchPlacementMode == .floatingIsland ? Color.black.opacity(0.45) : .clear,
-            radius: settings.clipNotchPlacementMode == .floatingIsland ? 9 : 0,
+            color: settings.clipNotchFinish == .neonAura ? settings.clipNotchColorway.primaryAccent.opacity(0.35) : (settings.clipNotchPlacementMode == .floatingIsland ? Color.black.opacity(0.45) : .clear),
+            radius: settings.clipNotchFinish == .neonAura ? 12 : (settings.clipNotchPlacementMode == .floatingIsland ? 9 : 0),
             x: 0,
-            y: settings.clipNotchPlacementMode == .floatingIsland ? 5 : 0
+            y: settings.clipNotchPlacementMode == .floatingIsland ? 5 : 2
         )
         .onHover { hovering in
             handleHover(hovering)
@@ -73,6 +93,11 @@ public struct ClipNotchView: View {
                 onRecord: { CaptureOverlayController.shared.showOverlay(initialMode: .record) },
                 onColor: { CaptureOverlayController.shared.showOverlay(initialMode: .colorPicker) },
                 onMore: { viewModel.showRecentShelf() }
+            )
+
+        case .musicPlayer:
+            ClipNotchMusicPlayerView(
+                onClose: { viewModel.showIdle() }
             )
 
         case .screenshotPreview(let item, _):
@@ -133,38 +158,13 @@ public struct ClipNotchView: View {
             )
 
         case .error(let message):
-            HStack(spacing: 8) {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundStyle(.orange)
-                Text(message)
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
-                Spacer(minLength: 4)
-                Button {
-                    viewModel.showIdle()
-                } label: {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 9, weight: .semibold))
-                        .foregroundStyle(.white.opacity(0.65))
-                }
-                .buttonStyle(.plain)
-                .help("Dismiss")
-            }
-            .padding(.horizontal, 12)
-            .transition(.opacity)
+            ClipNotchErrorRailView(
+                message: message,
+                onDismiss: { viewModel.showIdle() }
+            )
 
         case .fileDropHover:
-            VStack(spacing: 5) {
-                Image(systemName: "arrow.down.doc.fill")
-                    .font(.system(size: 16))
-                    .foregroundColor(.white)
-                Text("Drop to Pin")
-                    .font(.system(size: 10.5, weight: .semibold, design: .rounded))
-                    .foregroundColor(.white)
-            }
-            .padding(12)
-            .transition(reduceMotion ? .opacity : .opacity.combined(with: .move(edge: .top)))
+            ClipNotchFileDropTargetView()
 
         case .recentShelf(let items):
             ClipNotchRecentShelfView(
@@ -186,14 +186,69 @@ public struct ClipNotchView: View {
         }
     }
 
+    private var stateAccent: (color: Color, opacity: Double) {
+        switch viewModel.currentState {
+        case .idle:
+            return (settings.clipNotchColorway.primaryAccent, 0.07)
+        case .quickActions:
+            return (Color.cyan, 0.06)
+        case .musicPlayer:
+            return (settings.clipNotchColorway.primaryAccent, 0.12)
+        case .screenshotPreview, .videoInterruptedByScreenshot:
+            return (Color.green, 0.08)
+        case .video:
+            return (Color.blue, 0.06)
+        case .recording(_, let isPaused):
+            return isPaused ? (Color.orange, 0.07) : (Color.red, 0.09)
+        case .ocrResult:
+            return (Color.purple, 0.08)
+        case .colorResult(let hex, _, _):
+            return (Color(hex: hex), 0.10)
+        case .error:
+            return (Color.orange, 0.08)
+        case .fileDropHover:
+            return (Color.cyan, 0.10)
+        case .recentShelf:
+            return (Color.mint, 0.06)
+        }
+    }
+
+    private var backgroundAnimationKey: String {
+        if case .recording(_, let isPaused) = viewModel.currentState {
+            return "recording-\(isPaused)"
+        }
+        return viewModel.currentState.presentationKind.rawValue
+    }
+
     @ViewBuilder
     private var notchBackground: some View {
+        let accent = stateAccent
+        let finish = settings.clipNotchFinish
+        let washMultiplier = finish.radialWashMultiplier
         ZStack {
-            Color.black
+            finish.outerBaseColor
             LinearGradient(
-                colors: [Color.black, Color.black, Color.white.opacity(0.022)],
+                colors: [
+                    finish.outerTopFill,
+                    finish.outerBaseColor,
+                    finish.outerBottomFill
+                ],
                 startPoint: .top,
                 endPoint: .bottom
+            )
+            RadialGradient(
+                gradient: Gradient(colors: [
+                    accent.color.opacity(accent.opacity * washMultiplier),
+                    accent.color.opacity(accent.opacity * 0.35 * washMultiplier),
+                    Color.clear
+                ]),
+                center: UnitPoint(x: 0.5, y: 1.0),
+                startRadius: 0,
+                endRadius: 90
+            )
+            .animation(
+                reduceMotion ? nil : .spring(response: 0.42, dampingFraction: 0.88),
+                value: backgroundAnimationKey
             )
         }
     }
@@ -301,6 +356,102 @@ private struct CopiedToastView: View {
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel("Screenshot copied")
+    }
+}
+
+private struct ClipNotchErrorRailView: View {
+    let message: String
+    let onDismiss: () -> Void
+
+    @State private var isDismissHovered = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        HStack(spacing: 7) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(.orange)
+
+            Text(message)
+                .font(.system(size: 11, weight: .medium, design: .rounded))
+                .foregroundStyle(.white)
+                .lineLimit(1)
+
+            Spacer(minLength: 4)
+
+            Button(action: onDismiss) {
+                Image(systemName: "xmark")
+                    .font(.system(size: 8.5, weight: .bold))
+                    .foregroundStyle(.white.opacity(isDismissHovered ? 0.95 : 0.6))
+                    .frame(width: 18, height: 18)
+                    .background(Circle().fill(Color.white.opacity(isDismissHovered ? 0.14 : 0.06)))
+            }
+            .buttonStyle(.plain)
+            .help("Dismiss")
+            .accessibilityLabel("Dismiss error")
+            .onHover { isDismissHovered = $0 }
+        }
+        .padding(.horizontal, 10)
+        .frame(height: 28)
+        .background(
+            Capsule(style: .continuous)
+                .fill(Color.orange.opacity(0.08))
+        )
+        .overlay(
+            Capsule(style: .continuous)
+                .stroke(Color.orange.opacity(0.22), lineWidth: 0.6)
+        )
+        .padding(.horizontal, 6)
+        .frame(height: 38)
+        .transition(.opacity)
+        .accessibilityElement(children: .contain)
+    }
+}
+
+private struct ClipNotchFileDropTargetView: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var isRevealed = false
+
+    var body: some View {
+        VStack(spacing: 4) {
+            ZStack {
+                Circle()
+                    .fill(Color.cyan.opacity(0.15))
+                    .frame(width: 22, height: 22)
+
+                Image(systemName: "arrow.down.doc.fill")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(Color.cyan)
+            }
+            .scaleEffect(isRevealed ? 1.0 : 0.8)
+
+            Text("Drop to Pin")
+                .font(.system(size: 10.5, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(6)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(Color.cyan.opacity(0.06))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(Color.cyan.opacity(0.24), lineWidth: 0.75)
+        )
+        .padding(4)
+        .opacity(isRevealed ? 1 : 0)
+        .onAppear {
+            if reduceMotion {
+                isRevealed = true
+            } else {
+                withAnimation(.spring(response: 0.38, dampingFraction: 0.78)) {
+                    isRevealed = true
+                }
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Drop file to pin to recent shelf")
     }
 }
 

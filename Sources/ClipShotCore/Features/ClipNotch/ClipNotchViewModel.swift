@@ -110,6 +110,19 @@ public final class ClipNotchViewModel: ObservableObject {
         scheduleAutoCollapse()
     }
 
+    public func showMusicPlayer() {
+        cancelDismissTimer()
+        self.currentState = .musicPlayer
+    }
+
+    public func toggleMusicPlayer() {
+        if currentState == .musicPlayer {
+            showIdle()
+        } else {
+            showMusicPlayer()
+        }
+    }
+
     public func showRecentShelf() {
         cancelDismissTimer()
         refreshRecentItems()
@@ -129,6 +142,8 @@ public final class ClipNotchViewModel: ObservableObject {
         } else {
             if currentState == .quickActions {
                 showIdle()
+            } else if currentState == .musicPlayer {
+                scheduleAutoCollapse(after: 0.25)
             } else if case .screenshotPreview = currentState {
                 scheduleAutoCollapse(after: 1.4)
             } else if case .videoInterruptedByScreenshot = currentState {
@@ -143,7 +158,7 @@ public final class ClipNotchViewModel: ObservableObject {
 
     private func shouldAutoCollapse(state: ClipNotchState) -> Bool {
         switch state {
-        case .screenshotPreview, .videoInterruptedByScreenshot, .ocrResult, .colorResult, .error:
+        case .screenshotPreview, .videoInterruptedByScreenshot, .ocrResult, .colorResult, .error, .musicPlayer:
             return true
         default:
             return false

@@ -98,27 +98,38 @@ public final class ClipNotchController {
         frameAnimationTimer?.invalidate()
         let startFrame = panel.frame
         let startedAt = ProcessInfo.processInfo.systemUptime
-        let duration = 0.42
+        let motion = AppSettings.shared.clipNotchMotion
+        let duration = max(0.16, min(0.35, motion.springResponse))
 
-        let timer = Timer(timeInterval: 1.0 / 60.0, repeats: true) { [weak panel] timer in
+        // 120 FPS high-refresh rate display updates
+        let timer = Timer(timeInterval: 1.0 / 120.0, repeats: true) { [weak panel] timer in
             guard let panel else {
                 timer.invalidate()
                 return
             }
 
-            let progress = min(1, (ProcessInfo.processInfo.systemUptime - startedAt) / duration)
-            let eased = CGFloat(progress * progress * (3 - 2 * progress))
+            let elapsed = ProcessInfo.processInfo.systemUptime - startedAt
+            let progress = min(1.0, elapsed / duration)
+
+            let eased: CGFloat
+            if motion == .bouncy {
+                let p = progress
+                eased = CGFloat(sin(-13.0 * .pi / 2.0 * (p + 1.0)) * pow(2.0, -10.0 * p) + 1.0)
+            } else {
+                // Precision Apple Quartic deceleration
+                eased = CGFloat(1.0 - pow(1.0 - progress, 3.8))
+            }
+
             let frame = CGRect(
                 x: startFrame.origin.x + (targetFrame.origin.x - startFrame.origin.x) * eased,
                 y: startFrame.origin.y + (targetFrame.origin.y - startFrame.origin.y) * eased,
                 width: startFrame.width + (targetFrame.width - startFrame.width) * eased,
                 height: startFrame.height + (targetFrame.height - startFrame.height) * eased
             )
-            // Redrawing synchronously while SwiftUI is laying out the hosting view
-            // can recurse back into AppKit layout during rapid notch transitions.
             panel.setFrame(frame, display: false)
 
-            if progress >= 1 {
+            if progress >= 1.0 {
+                panel.setFrame(targetFrame, display: false)
                 timer.invalidate()
             }
         }
@@ -133,6 +144,9 @@ public final class ClipNotchController {
 
         case .quickActions:
             return CGSize(width: 300, height: 38)
+
+        case .musicPlayer:
+            return CGSize(width: 400, height: 208)
 
         case .screenshotPreview, .videoInterruptedByScreenshot:
             return CGSize(width: 138, height: 34)

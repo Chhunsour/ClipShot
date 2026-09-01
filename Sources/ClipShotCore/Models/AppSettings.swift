@@ -72,6 +72,9 @@ public final class AppSettings: ObservableObject {
         static let clipNotchVideoSize = "clipNotchVideoSize"
         static let clipNotchOLEDProtection = "clipNotchOLEDProtection"
         static let clipNotchShowInFullscreen = "clipNotchShowInFullscreen"
+        static let clipNotchColorway = "clipNotchColorway"
+        static let clipNotchFinish = "clipNotchFinish"
+        static let clipNotchMotion = "clipNotchMotion"
     }
 
     // MARK: - Published Properties
@@ -333,6 +336,18 @@ public final class AppSettings: ObservableObject {
         didSet { defaults.set(clipNotchShowInFullscreen, forKey: Keys.clipNotchShowInFullscreen) }
     }
 
+    @Published public var clipNotchColorway: ClipNotchColorway {
+        didSet { defaults.set(clipNotchColorway.rawValue, forKey: Keys.clipNotchColorway) }
+    }
+
+    @Published public var clipNotchFinish: ClipNotchFinish {
+        didSet { defaults.set(clipNotchFinish.rawValue, forKey: Keys.clipNotchFinish) }
+    }
+
+    @Published public var clipNotchMotion: ClipNotchMotion {
+        didSet { defaults.set(clipNotchMotion.rawValue, forKey: Keys.clipNotchMotion) }
+    }
+
     // MARK: - Init
 
     public init(defaults: UserDefaults = .standard) {
@@ -395,7 +410,10 @@ public final class AppSettings: ObservableObject {
             Keys.clipNotchVideoFPS: 30,
             Keys.clipNotchVideoSize: VideoCapsuleSize.medium.rawValue,
             Keys.clipNotchOLEDProtection: false,
-            Keys.clipNotchShowInFullscreen: true
+            Keys.clipNotchShowInFullscreen: true,
+            Keys.clipNotchColorway: ClipNotchColorway.prism.rawValue,
+            Keys.clipNotchFinish: ClipNotchFinish.obsidian.rawValue,
+            Keys.clipNotchMotion: ClipNotchMotion.fluid.rawValue
         ])
 
         self.autoCopyEnabled = defaults.bool(forKey: Keys.autoCopyEnabled)
@@ -517,6 +535,15 @@ public final class AppSettings: ObservableObject {
         self.clipNotchOLEDProtection = defaults.bool(forKey: Keys.clipNotchOLEDProtection)
         self.clipNotchShowInFullscreen = defaults.bool(forKey: Keys.clipNotchShowInFullscreen)
 
+        let colorwayRaw = defaults.string(forKey: Keys.clipNotchColorway) ?? ClipNotchColorway.prism.rawValue
+        self.clipNotchColorway = ClipNotchColorway(rawValue: colorwayRaw) ?? .prism
+
+        let finishRaw = defaults.string(forKey: Keys.clipNotchFinish) ?? ClipNotchFinish.obsidian.rawValue
+        self.clipNotchFinish = ClipNotchFinish(rawValue: finishRaw) ?? .obsidian
+
+        let motionRaw = defaults.string(forKey: Keys.clipNotchMotion) ?? ClipNotchMotion.fluid.rawValue
+        self.clipNotchMotion = ClipNotchMotion(rawValue: motionRaw) ?? .fluid
+
         applyInstantPastePreference()
         applyAppearance()
     }
@@ -589,6 +616,9 @@ public final class AppSettings: ObservableObject {
         clipNotchVideoSize = .medium
         clipNotchOLEDProtection = false
         clipNotchShowInFullscreen = true
+        clipNotchColorway = .prism
+        clipNotchFinish = .obsidian
+        clipNotchMotion = .fluid
     }
 
     private func updateActivationPolicy() {
