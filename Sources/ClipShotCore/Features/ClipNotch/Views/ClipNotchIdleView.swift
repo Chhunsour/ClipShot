@@ -12,7 +12,7 @@ public struct ClipNotchIdleView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     @State private var hoveredControl: Control?
-    @State private var isRotating = false
+    @State private var isRevealed = false
     @State private var musicHoverWorkItem: DispatchWorkItem?
     @State private var clockString = ""
     @State private var clockTimer: Timer?
@@ -51,6 +51,10 @@ public struct ClipNotchIdleView: View {
                     clipboardButton
                 }
                 .padding(.horizontal, settings.clipNotchSize >= .ultraWide ? 14 : 10)
+                .opacity(reduceMotion || isRevealed ? 1 : 0)
+                .scaleEffect(x: reduceMotion || isRevealed ? 1 : 0.92, y: reduceMotion || isRevealed ? 1 : 0.78, anchor: .top)
+                .offset(y: reduceMotion || isRevealed ? 0 : -3)
+                .animation(reduceMotion ? nil : .spring(response: 0.42, dampingFraction: 0.84), value: isRevealed)
             } else {
                 Color.clear.frame(width: 1, height: 1)
             }
@@ -58,13 +62,16 @@ public struct ClipNotchIdleView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .transition(.opacity)
         .onAppear {
-            isRotating = true
             updateClock()
             startTimers()
+            if !reduceMotion {
+                DispatchQueue.main.async { isRevealed = true }
+            }
         }
         .onDisappear {
             clockTimer?.invalidate()
             eqTimer?.invalidate()
+            isRevealed = false
         }
     }
 
@@ -124,8 +131,23 @@ public struct ClipNotchIdleView: View {
         .padding(.horizontal, 4)
         .frame(height: 32)
         .background(
-            Capsule(style: .continuous)
-                .fill(Color.white.opacity(nowPlaying.isPlaying ? finish.activeMediaRailFillOpacity : finish.inactiveMediaRailFillOpacity))
+            ZStack {
+                Capsule(style: .continuous)
+                    .fill(Color.white.opacity(nowPlaying.isPlaying ? finish.activeMediaRailFillOpacity : finish.inactiveMediaRailFillOpacity))
+
+                if colorway == .albumAura {
+                    Capsule(style: .continuous)
+                        .fill(LinearGradient(
+                            colors: [
+                                colorway.primaryAccent.opacity(nowPlaying.isPlaying ? 0.18 : 0.08),
+                                colorway.secondaryAccent.opacity(0.07),
+                                .clear
+                            ],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        ))
+                }
+            }
         )
         .overlay(
             Capsule(style: .continuous)
@@ -157,29 +179,38 @@ public struct ClipNotchIdleView: View {
     private var mediaArtwork: some View {
         let colorway = settings.clipNotchColorway
         let motion = settings.clipNotchMotion
+        let playbackProgress = nowPlaying.duration > 0
+            ? min(1, max(0, nowPlaying.currentPosition / nowPlaying.duration))
+            : 0
 
         return Button {
             ClipNotchViewModel.shared.toggleMusicPlayer()
         } label: {
             ZStack {
+                if colorway == .albumAura, let artwork = nowPlaying.artwork {
+                    Image(nsImage: artwork)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 27, height: 27)
+                        .clipShape(Circle())
+                        .scaleEffect(1.18)
+                        .blur(radius: 5)
+                        .opacity(nowPlaying.isPlaying ? 0.58 : 0.25)
+                }
+
                 Circle()
                     .stroke(Color.white.opacity(0.12), lineWidth: 1.0)
                     .frame(width: 28, height: 28)
 
                 Circle()
-                    .trim(from: 0.0, to: 0.72)
+                    .trim(from: 0, to: max(nowPlaying.hasMedia ? 0.025 : 0, playbackProgress))
                     .stroke(
-                        colorway.orbGradient,
-                        style: StrokeStyle(lineWidth: 1.3, lineCap: .round)
+                        colorway.controlGradient,
+                        style: StrokeStyle(lineWidth: 1.5, lineCap: .round)
                     )
                     .frame(width: 28, height: 28)
-                    .rotationEffect(.degrees(isRotating && nowPlaying.isPlaying && !reduceMotion ? 360 : 0))
-                    .animation(
-                        nowPlaying.isPlaying && !reduceMotion
-                            ? .linear(duration: motion.orbitDuration).repeatForever(autoreverses: false)
-                            : .easeOut(duration: 0.25),
-                        value: isRotating && nowPlaying.isPlaying && !reduceMotion
-                    )
+                    .rotationEffect(.degrees(-90))
+                    .animation(reduceMotion ? nil : .linear(duration: 0.25), value: playbackProgress)
                     .opacity(nowPlaying.isPlaying ? 1 : (nowPlaying.hasMedia ? 0.45 : 0.22))
                     .animation(reduceMotion ? nil : .easeInOut(duration: 0.25), value: nowPlaying.isPlaying)
 
@@ -381,6 +412,7 @@ public struct ClipNotchIdleView: View {
     private var clipboardButton: some View {
         let finish = settings.clipNotchFinish
         let motion = settings.clipNotchMotion
+        let colorway = settings.clipNotchColorway
         let isHovered = hoveredControl == .clipboard
 
         return Button(action: onClipboard) {
@@ -390,12 +422,13 @@ public struct ClipNotchIdleView: View {
                 if settings.clipNotchSize != .compact {
                     VStack(alignment: .leading, spacing: 0) {
                         Text(clipboardTitle)
-                            .font(.system(size: 9, weight: .semibold, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.86))
+                            .font(.system(size: 8.5, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.92))
                             .lineLimit(1)
-                        Text("Clipboard")
-                            .font(.system(size: 7.5, weight: .medium, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.34))
+                        Text(clipboardSubtitle)
+                            .font(.system(size: 6.5, weight: .semibold, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.38))
+                            .lineLimit(1)
                     }
                     .frame(width: clipboardLabelWidth, alignment: .leading)
                 }
@@ -404,12 +437,31 @@ public struct ClipNotchIdleView: View {
             .padding(.horizontal, 5)
             .frame(height: 32)
             .background(
-                Capsule(style: .continuous)
-                    .fill(Color.white.opacity(finish.clipboardFillOpacity(isHovered: isHovered)))
+                ZStack {
+                    Capsule(style: .continuous)
+                        .fill(Color.white.opacity(finish.clipboardFillOpacity(isHovered: isHovered)))
+                    Capsule(style: .continuous)
+                        .fill(LinearGradient(
+                            colors: colorway == .albumAura
+                                ? [colorway.secondaryAccent.opacity(isHovered ? 0.11 : 0.055), .clear]
+                                : [.white.opacity(isHovered ? 0.08 : 0.035), .clear],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        ))
+                }
             )
             .overlay(
                 Capsule(style: .continuous)
-                    .stroke(Color.white.opacity(finish.clipboardStrokeOpacity(isHovered: isHovered)), lineWidth: 0.6)
+                    .stroke(
+                        LinearGradient(
+                            colors: colorway == .albumAura
+                                ? [colorway.primaryAccent.opacity(isHovered ? 0.42 : 0.24), .white.opacity(0.08)]
+                                : [.white.opacity(finish.clipboardStrokeOpacity(isHovered: isHovered))],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        ),
+                        lineWidth: 0.6
+                    )
             )
             .opacity(isHovered ? 1 : 0.88)
             .scaleEffect(isHovered && !reduceMotion ? motion.clipboardHoverScale : 1, anchor: .trailing)
@@ -437,25 +489,40 @@ public struct ClipNotchIdleView: View {
         let isHovered = hoveredControl == .clipboard
 
         return ZStack {
-            Circle().fill(.white.opacity(finish.clipboardOrbFillOpacity(isHovered: isHovered)))
+            RoundedRectangle(cornerRadius: 6.5, style: .continuous)
+                .fill(.white.opacity(finish.clipboardOrbFillOpacity(isHovered: isHovered)))
 
             if let item = clipboardManager.currentItem,
                item.kind == .image,
                let preview = item.previewImage {
+                RoundedRectangle(cornerRadius: 4.5, style: .continuous)
+                    .fill(.white.opacity(0.12))
+                    .frame(width: 21, height: 19)
+                    .rotationEffect(.degrees(-7))
+                    .offset(x: -1.5)
+
                 Image(nsImage: preview)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
-                    .frame(width: 20, height: 20)
-                    .clipShape(Circle())
-                    .overlay(Circle().stroke(.white.opacity(0.18), lineWidth: 0.5))
+                    .frame(width: 24, height: 22)
+                    .clipShape(RoundedRectangle(cornerRadius: 5.5, style: .continuous))
+                    .overlay(alignment: .bottomTrailing) {
+                        Image(systemName: "camera.fill")
+                            .font(.system(size: 4.5, weight: .bold))
+                            .foregroundStyle(.white)
+                            .padding(2.5)
+                            .background(Circle().fill(.black.opacity(0.72)))
+                            .offset(x: 2, y: 2)
+                    }
             } else {
                 Image(systemName: clipboardManager.currentItem?.kind == .text ? "text.alignleft" : "doc.on.clipboard")
                     .font(.system(size: 8, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.78))
             }
         }
-        .frame(width: 24, height: 24)
-        .overlay(Circle().stroke(.white.opacity(0.09), lineWidth: 0.6))
+        .frame(width: 26, height: 24)
+        .overlay(RoundedRectangle(cornerRadius: 6.5, style: .continuous).stroke(.white.opacity(0.14), lineWidth: 0.6))
+        .shadow(color: .black.opacity(0.45), radius: 2, y: 1)
     }
 
     @ViewBuilder
@@ -483,6 +550,11 @@ public struct ClipNotchIdleView: View {
         return item.kind == .image ? "Screenshot" : "Text copied"
     }
 
+    private var clipboardSubtitle: String {
+        guard let item = clipboardManager.currentItem else { return "CLIPBOARD" }
+        return item.kind == .image ? "CAPTURE READY" : "READY TO PASTE"
+    }
+
     private func setHover(_ control: Control, active: Bool) {
         if active {
             hoveredControl = control
@@ -492,7 +564,10 @@ public struct ClipNotchIdleView: View {
                     viewModel?.showMusicPlayer()
                 }
                 musicHoverWorkItem = item
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6, execute: item)
+                DispatchQueue.main.asyncAfter(
+                    deadline: .now() + ClipNotchViewModel.musicPlayerHoverOpenDelay,
+                    execute: item
+                )
             }
         } else {
             if control == .artwork || control == .previous || control == .next {
@@ -523,4 +598,3 @@ public struct ClipNotchIdleView: View {
         clockString = formatter.string(from: Date())
     }
 }
-

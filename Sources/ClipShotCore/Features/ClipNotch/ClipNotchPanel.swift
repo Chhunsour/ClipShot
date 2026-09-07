@@ -34,6 +34,7 @@ public final class ClipNotchPanel: NSPanel {
 @MainActor
 public final class ClipNotchController {
     public static let shared = ClipNotchController()
+    static let musicPlayerOpenDuration = 0.12
 
     private var panel: ClipNotchPanel?
     private var frameAnimationTimer: Timer?
@@ -99,10 +100,17 @@ public final class ClipNotchController {
         let startFrame = panel.frame
         let startedAt = ProcessInfo.processInfo.systemUptime
         let motion = AppSettings.shared.clipNotchMotion
-        let duration = max(0.16, min(0.35, motion.springResponse))
+        let duration: TimeInterval
+        if targetFrame.width < startFrame.width {
+            duration = 0.20
+        } else if ClipNotchViewModel.shared.currentState == .musicPlayer {
+            duration = Self.musicPlayerOpenDuration
+        } else {
+            duration = max(0.16, min(0.35, motion.springResponse))
+        }
 
-        // 120 FPS high-refresh rate display updates
-        let timer = Timer(timeInterval: 1.0 / 120.0, repeats: true) { [weak panel] timer in
+        let refreshRate = max(60, min(120, panel.screen?.maximumFramesPerSecond ?? 60))
+        let timer = Timer(timeInterval: 1.0 / Double(refreshRate), repeats: true) { [weak panel] timer in
             guard let panel else {
                 timer.invalidate()
                 return
@@ -171,7 +179,7 @@ public final class ClipNotchController {
             return CGSize(width: 160, height: 54)
 
         case .recentShelf:
-            return CGSize(width: 410, height: 168)
+            return CGSize(width: 430, height: 190)
         }
     }
 

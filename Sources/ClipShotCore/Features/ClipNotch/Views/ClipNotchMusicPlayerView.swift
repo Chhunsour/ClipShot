@@ -17,12 +17,9 @@ public struct ClipNotchMusicPlayerView: View {
     @State private var hoveredButton: ControlButton?
     @State private var equalizerPhases: [CGFloat] = [0.4, 0.9, 0.6, 0.8, 0.3]
     @State private var equalizerTimer: Timer?
-    @State private var isShuffle = false
-    @State private var isRepeat = false
-    @State private var isFavorite = false
+    @State private var playbackOptions = SystemMediaPlaybackOptions.unavailable
     @State private var systemVolume: Double = 0.75
-    @State private var vinylRotation: Double = 0
-    @State private var vinylTimer: Timer?
+    @State private var isRevealed = false
 
     private enum ControlButton {
         case previous
@@ -54,21 +51,22 @@ public struct ClipNotchMusicPlayerView: View {
         let colorway = settings.clipNotchColorway
         let motion = settings.clipNotchMotion
 
-        VStack(spacing: 8) {
-            // MARK: - Header Bar (Clean of notch top edge)
-            headerBar(colorway: colorway)
+        ZStack {
+            if colorway == .albumAura {
+                albumAuraBackdrop(colorway: colorway)
+            }
 
-            // MARK: - Main Track Info Row (Artwork + Title + Artist)
-            trackInfoRow(colorway: colorway)
-
-            // MARK: - Interactive Scrubber & Timestamps
-            scrubberSection(colorway: colorway)
-
-            // MARK: - Playback Controls Row
-            controlsRow(colorway: colorway, motion: motion)
-
-            // MARK: - Volume Bar
-            volumeSection(colorway: colorway)
+            VStack(spacing: 8) {
+                headerBar(colorway: colorway)
+                trackInfoRow(colorway: colorway)
+                scrubberSection(colorway: colorway)
+                controlsRow(colorway: colorway, motion: motion)
+                volumeSection(colorway: colorway)
+            }
+            .opacity(reduceMotion || isRevealed ? 1 : 0)
+            .scaleEffect(x: reduceMotion || isRevealed ? 1 : 0.94, y: reduceMotion || isRevealed ? 1 : 0.82, anchor: .topLeading)
+            .offset(x: reduceMotion || isRevealed ? 0 : -3, y: reduceMotion || isRevealed ? 0 : -3)
+            .animation(reduceMotion ? nil : .spring(response: 0.12, dampingFraction: 0.88), value: isRevealed)
         }
         .padding(.horizontal, 20)
         .padding(.top, 18)
@@ -76,13 +74,18 @@ public struct ClipNotchMusicPlayerView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onAppear {
             startEqualizerAnimation()
-            startVinylAnimation()
             systemVolume = SystemMediaController.getVolume()
+            refreshPlaybackOptions()
+            if !reduceMotion {
+                DispatchQueue.main.async { isRevealed = true }
+            }
         }
         .onDisappear {
             equalizerTimer?.invalidate()
-            vinylTimer?.invalidate()
+            isRevealed = false
         }
+        .onChange(of: nowPlaying.title) { refreshPlaybackOptions() }
+        .onChange(of: nowPlaying.sourceBundleIdentifier) { refreshPlaybackOptions() }
     }
 
     // MARK: - Subcomponents
@@ -140,18 +143,18 @@ public struct ClipNotchMusicPlayerView: View {
     }
 
     private var headerAppBadge: (title: String, tint: Color) {
-        let ws = NSWorkspace.shared
-        let runningApps = ws.runningApplications
-        if runningApps.contains(where: { $0.bundleIdentifier == "com.spotify.client" }) {
+        switch nowPlaying.sourceBundleIdentifier {
+        case "com.spotify.client":
             return ("SPOTIFY", Color(red: 29 / 255, green: 185 / 255, blue: 84 / 255))
-        } else if runningApps.contains(where: { $0.bundleIdentifier == "com.apple.Music" }) {
+        case "com.apple.Music":
             return ("APPLE MUSIC", Color(red: 250 / 255, green: 45 / 255, blue: 72 / 255))
-        } else if runningApps.contains(where: { $0.bundleIdentifier == "com.apple.podcasts" }) {
+        case "com.apple.podcasts":
             return ("PODCASTS", Color(red: 168 / 255, green: 85 / 255, blue: 247 / 255))
-        } else if nowPlaying.hasMedia {
-            return ("NOW PLAYING", settings.clipNotchColorway.primaryAccent)
-        } else {
-            return ("SYSTEM AUDIO", settings.clipNotchColorway.primaryAccent)
+        default:
+            let title = nowPlaying.sourceAppName.isEmpty
+                ? (nowPlaying.hasMedia ? "NOW PLAYING" : "SYSTEM AUDIO")
+                : nowPlaying.sourceAppName.uppercased()
+            return (title, settings.clipNotchColorway.primaryAccent)
         }
     }
 
@@ -161,6 +164,17 @@ public struct ClipNotchMusicPlayerView: View {
             // Artwork with ambient glow
             ZStack {
                 if let artwork = nowPlaying.artwork {
+                    if colorway == .albumAura {
+                        Image(nsImage: artwork)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 52, height: 52)
+                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            .scaleEffect(1.28)
+                            .blur(radius: 13)
+                            .opacity(nowPlaying.isPlaying ? 0.48 : 0.22)
+                    }
+
                     Image(nsImage: artwork)
                         .resizable()
                         .aspectRatio(contentMode: .fill)
@@ -201,7 +215,6 @@ public struct ClipNotchMusicPlayerView: View {
                             .font(.system(size: 15, weight: .bold))
                             .foregroundStyle(colorway.primaryAccent.opacity(0.9))
                     }
-                    .rotationEffect(.degrees(vinylRotation))
                     .shadow(color: colorway.primaryAccent.opacity(nowPlaying.isPlaying ? 0.35 : 0.1), radius: 6, x: 0, y: 2)
                 }
             }
@@ -250,17 +263,19 @@ public struct ClipNotchMusicPlayerView: View {
     @ViewBuilder
     private func controlsRow(colorway: ClipNotchColorway, motion: ClipNotchMotion) -> some View {
         HStack(spacing: 14) {
-            // Shuffle
-            Button {
-                isShuffle.toggle()
-            } label: {
-                Image(systemName: "shuffle")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(isShuffle ? colorway.primaryAccent : .white.opacity(0.45))
-                    .frame(width: 22, height: 22)
+            if playbackOptions.shuffleAvailable {
+                Button {
+                    toggle(.shuffle)
+                } label: {
+                    Image(systemName: "shuffle")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(playbackOptions.shuffle ? colorway.primaryAccent : .white.opacity(0.45))
+                        .frame(width: 22, height: 22)
+                }
+                .buttonStyle(.plain)
+                .help("Toggle shuffle")
+                .accessibilityLabel("Toggle shuffle")
             }
-            .buttonStyle(.plain)
-            .help("Shuffle")
 
             // Previous track
             Button {
@@ -299,7 +314,7 @@ public struct ClipNotchMusicPlayerView: View {
             } label: {
                 ZStack {
                     Circle()
-                        .fill(colorway.swatchGradient)
+                        .fill(colorway.controlGradient)
                         .frame(width: 35, height: 35)
                         .shadow(color: colorway.primaryAccent.opacity(0.45), radius: 6)
 
@@ -347,29 +362,33 @@ public struct ClipNotchMusicPlayerView: View {
             .help("Next track")
             .onHover { hoveredButton = $0 ? .next : nil }
 
-            // Repeat
-            Button {
-                isRepeat.toggle()
-            } label: {
-                Image(systemName: "repeat")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(isRepeat ? colorway.primaryAccent : .white.opacity(0.45))
-                    .frame(width: 22, height: 22)
+            if playbackOptions.repeatAvailable {
+                Button {
+                    toggle(.repeatMode)
+                } label: {
+                    Image(systemName: "repeat")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(playbackOptions.repeatEnabled ? colorway.primaryAccent : .white.opacity(0.45))
+                        .frame(width: 22, height: 22)
+                }
+                .buttonStyle(.plain)
+                .help("Toggle repeat")
+                .accessibilityLabel("Toggle repeat")
             }
-            .buttonStyle(.plain)
-            .help("Repeat")
 
-            // Favorite
-            Button {
-                isFavorite.toggle()
-            } label: {
-                Image(systemName: isFavorite ? "heart.fill" : "heart")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(isFavorite ? Color.red : .white.opacity(0.45))
-                    .frame(width: 22, height: 22)
+            if playbackOptions.favoriteAvailable {
+                Button {
+                    toggle(.favorite)
+                } label: {
+                    Image(systemName: playbackOptions.favorite ? "heart.fill" : "heart")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(playbackOptions.favorite ? Color.red : .white.opacity(0.45))
+                        .frame(width: 22, height: 22)
+                }
+                .buttonStyle(.plain)
+                .help("Toggle favorite")
+                .accessibilityLabel("Toggle favorite")
             }
-            .buttonStyle(.plain)
-            .help("Favorite")
         }
     }
 
@@ -400,7 +419,7 @@ public struct ClipNotchMusicPlayerView: View {
                         .frame(height: 3.5)
 
                     Capsule()
-                        .fill(Color.white.opacity(0.7))
+                        .fill(colorway == .albumAura ? colorway.primaryAccent.opacity(0.88) : Color.white.opacity(0.7))
                         .frame(width: max(3.5, thumbX), height: 3.5)
 
                     Circle()
@@ -513,6 +532,8 @@ public struct ClipNotchMusicPlayerView: View {
             )
         }
         .frame(height: 12)
+        .allowsHitTesting(totalDuration > 0)
+        .opacity(totalDuration > 0 ? 1 : 0.45)
     }
 
     // MARK: - Animated Equalizer Visualizer
@@ -540,12 +561,37 @@ public struct ClipNotchMusicPlayerView: View {
         }
     }
 
-    private func startVinylAnimation() {
-        vinylTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { _ in
-            if nowPlaying.isPlaying && !reduceMotion {
-                vinylRotation = (vinylRotation + 1.2).truncatingRemainder(dividingBy: 360)
-            }
+    private func refreshPlaybackOptions() {
+        SystemMediaController.playbackOptions(for: nowPlaying.sourceBundleIdentifier) { playbackOptions = $0 }
+    }
+
+    private func toggle(_ option: SystemMediaOption) {
+        SystemMediaController.toggle(option, for: nowPlaying.sourceBundleIdentifier) { newValue in
+            guard newValue != nil else { return }
+            refreshPlaybackOptions()
         }
+    }
+
+    private func albumAuraBackdrop(colorway: ClipNotchColorway) -> some View {
+        GeometryReader { proxy in
+            ZStack {
+                Circle()
+                    .fill(colorway.primaryAccent.opacity(nowPlaying.isPlaying ? 0.20 : 0.10))
+                    .frame(width: 170, height: 170)
+                    .blur(radius: 34)
+                    .offset(x: -52, y: -34)
+
+                Ellipse()
+                    .fill(colorway.secondaryAccent.opacity(nowPlaying.isPlaying ? 0.12 : 0.06))
+                    .frame(width: proxy.size.width * 0.72, height: 96)
+                    .blur(radius: 38)
+                    .offset(x: proxy.size.width * 0.18, y: proxy.size.height * 0.42)
+            }
+            .opacity(reduceMotion || isRevealed ? 1 : 0)
+            .scaleEffect(reduceMotion || isRevealed ? 1 : 0.72, anchor: .topLeading)
+            .animation(reduceMotion ? nil : .easeOut(duration: 0.10), value: isRevealed)
+        }
+        .allowsHitTesting(false)
     }
 
     private func formatTime(_ seconds: Double) -> String {
@@ -556,4 +602,3 @@ public struct ClipNotchMusicPlayerView: View {
         return String(format: "%d:%02d", mins, secs)
     }
 }
-

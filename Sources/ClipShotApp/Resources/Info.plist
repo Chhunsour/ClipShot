@@ -36,6 +36,8 @@
     <string>ClipShot captures selected screen areas when you trigger capture actions.</string>
     <key>NSDesktopFolderUsageDescription</key>
     <string>ClipShot monitors your screenshot folder to automatically copy newly taken screenshots.</string>
+    <key>NSAppleEventsUsageDescription</key>
+    <string>ClipShot controls playback options in your active music app when you use the music player.</string>
     <key>NSDocumentsFolderUsageDescription</key>
     <string>ClipShot monitors your screenshot folder to automatically copy newly taken screenshots.</string>
     <key>NSDownloadsFolderUsageDescription</key>

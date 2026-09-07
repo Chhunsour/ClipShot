@@ -10,6 +10,13 @@ final class ClipNotchStateMachineTests: XCTestCase {
         XCTAssertEqual(vm.currentState, .idle)
     }
 
+    func testMusicPlayerFinishesOpeningWithinThreeTenthsOfASecond() {
+        XCTAssertLessThanOrEqual(
+            ClipNotchViewModel.musicPlayerHoverOpenDelay + ClipNotchController.musicPlayerOpenDuration,
+            0.3
+        )
+    }
+
     func testShowQuickActions() {
         let vm = ClipNotchViewModel()
         vm.showQuickActions()
@@ -143,5 +150,25 @@ final class ClipNotchStateMachineTests: XCTestCase {
         XCTAssertEqual(ClipNotchState.error(message: "err").presentationKind, .error)
         XCTAssertEqual(ClipNotchState.fileDropHover.presentationKind, .fileDropHover)
         XCTAssertEqual(ClipNotchState.recentShelf(items: []).presentationKind, .recentShelf)
+    }
+
+    func testMusicPlayerCollapsesQuicklyAfterHoverExit() async throws {
+        let vm = ClipNotchViewModel()
+        vm.showMusicPlayer()
+        vm.setHovered(false)
+
+        try await Task.sleep(nanoseconds: 250_000_000)
+        XCTAssertEqual(vm.currentState, .idle)
+    }
+
+    func testMusicPlayerHoverReentryCancelsCollapse() async throws {
+        let vm = ClipNotchViewModel()
+        vm.showMusicPlayer()
+        vm.setHovered(false)
+        try await Task.sleep(nanoseconds: 50_000_000)
+        vm.setHovered(true)
+
+        try await Task.sleep(nanoseconds: 200_000_000)
+        XCTAssertEqual(vm.currentState, .musicPlayer)
     }
 }

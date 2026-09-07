@@ -1,4 +1,5 @@
 import Foundation
+import AppKit
 import SwiftUI
 
 /// Curated 3-color palettes driving the ClipNotch chromatic orbit, rail gradients, and idle glow.
@@ -16,6 +17,7 @@ public enum ClipNotchColorway: String, CaseIterable, Identifiable, Codable, Send
     case arctic = "Arctic"
     case champagne = "Champagne"
     case monochrome = "Monochrome"
+    case albumAura = "Album Aura"
 
     public var id: String { rawValue }
 
@@ -48,27 +50,32 @@ public enum ClipNotchColorway: String, CaseIterable, Identifiable, Codable, Send
             return ["#F6D365", "#FDA085", "#D4AF37"]
         case .monochrome:
             return ["#F5F7FA", "#AAB3C2", "#687386"]
+        case .albumAura:
+            return ArtworkPalette.fallbackHexColors
         }
     }
 
     /// The three colors parsed using the module's Color(hex:) initializer.
     public var colors: [Color] {
-        hexColors.map { Color(hex: $0) }
+        if self == .albumAura {
+            return SystemNowPlayingService.shared.artworkPalette.map(Color.init(nsColor:))
+        }
+        return hexColors.map { Color(hex: $0) }
     }
 
     /// Primary accent color (first stop) used for notch idle wash and active rail glow.
     public var primaryAccent: Color {
-        Color(hex: hexColors[0])
+        colors[0]
     }
 
     /// Secondary accent color (middle stop).
     public var secondaryAccent: Color {
-        Color(hex: hexColors[1])
+        colors[1]
     }
 
     /// Tertiary accent color (end stop).
     public var tertiaryAccent: Color {
-        Color(hex: hexColors[2])
+        colors[2]
     }
 
     /// Soft jewel glint stop inserted between the third and first color in the orb orbit.
@@ -105,6 +112,133 @@ public enum ClipNotchColorway: String, CaseIterable, Identifiable, Codable, Send
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
+    }
+
+    /// Keeps Album Aura's hero control anchored to the artwork's strongest sampled color.
+    public var controlGradient: LinearGradient {
+        let palette = colors
+        return LinearGradient(
+            colors: self == .albumAura
+                ? [palette[0], palette[0], palette[1]]
+                : palette,
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+}
+
+/// Extracts a small, vivid palette once per artwork change for Album Aura.
+enum ArtworkPalette {
+    static let fallbackHexColors = ["#59E1FF", "#8B7CFF", "#FF5EA8"]
+    static let fallback = [
+        NSColor(srgbRed: 0.35, green: 0.88, blue: 1.00, alpha: 1),
+        NSColor(srgbRed: 0.55, green: 0.49, blue: 1.00, alpha: 1),
+        NSColor(srgbRed: 1.00, green: 0.37, blue: 0.66, alpha: 1)
+    ]
+
+    private struct Bucket {
+        var count = 0
+        var red = 0.0
+        var green = 0.0
+        var blue = 0.0
+    }
+
+    static func colors(from image: NSImage) -> [NSColor] {
+        guard let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil),
+              let context = CGContext(
+                data: nil,
+                width: 24,
+                height: 24,
+                bitsPerComponent: 8,
+                bytesPerRow: 24 * 4,
+                space: CGColorSpaceCreateDeviceRGB(),
+                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+              ),
+              let data = context.data else { return fallback }
+
+        context.interpolationQuality = .medium
+        context.draw(cgImage, in: CGRect(x: 0, y: 0, width: 24, height: 24))
+
+        let bytes = data.bindMemory(to: UInt8.self, capacity: 24 * 24 * 4)
+        var buckets: [Int: Bucket] = [:]
+        for index in stride(from: 0, to: 24 * 24 * 4, by: 4) {
+            guard bytes[index + 3] > 96 else { continue }
+            let red = Double(bytes[index]) / 255
+            let green = Double(bytes[index + 1]) / 255
+            let blue = Double(bytes[index + 2]) / 255
+            let brightness = max(red, green, blue)
+            guard brightness > 0.02, brightness < 0.99 else { continue }
+
+            let key = (Int(red * 7) << 6) | (Int(green * 7) << 3) | Int(blue * 7)
+            var bucket = buckets[key, default: Bucket()]
+            bucket.count += 1
+            bucket.red += red
+            bucket.green += green
+            bucket.blue += blue
+            buckets[key] = bucket
+        }
+
+        let ranked = buckets.values.sorted { lhs, rhs in
+            score(lhs) > score(rhs)
+        }
+        var result: [NSColor] = []
+        for bucket in ranked {
+            let color = polishedColor(bucket)
+            guard result.allSatisfy({ distance(color, $0) > 0.18 }) else { continue }
+            result.append(color)
+            if result.count == 3 { return result }
+        }
+
+        guard let anchor = result.first else { return fallback }
+        let rgb = anchor.usingColorSpace(.sRGB) ?? anchor
+        while result.count < 3 {
+            result.append(NSColor(
+                hue: rgb.hueComponent,
+                saturation: result.count == 1
+                    ? max(0.28, rgb.saturationComponent * 0.82)
+                    : min(1, rgb.saturationComponent * 1.08),
+                brightness: result.count == 1
+                    ? min(1, rgb.brightnessComponent + 0.14)
+                    : max(0.44, rgb.brightnessComponent - 0.10),
+                alpha: 1
+            ))
+        }
+        return result
+    }
+
+    private static func score(_ bucket: Bucket) -> Double {
+        let count = Double(bucket.count)
+        let red = bucket.red / count
+        let green = bucket.green / count
+        let blue = bucket.blue / count
+        let saturation = max(red, green, blue) - min(red, green, blue)
+        let brightness = max(red, green, blue)
+        return sqrt(count) * (0.3 + saturation * 1.7) * (0.55 + brightness)
+    }
+
+    private static func polishedColor(_ bucket: Bucket) -> NSColor {
+        let count = CGFloat(bucket.count)
+        let red = CGFloat(bucket.red) / count
+        let green = CGFloat(bucket.green) / count
+        let blue = CGFloat(bucket.blue) / count
+        let source = NSColor(
+            srgbRed: red,
+            green: green,
+            blue: blue,
+            alpha: 1
+        )
+        return NSColor(
+            hue: source.hueComponent,
+            saturation: source.saturationComponent,
+            brightness: min(0.96, max(0.46, source.brightnessComponent)),
+            alpha: 1
+        )
+    }
+
+    private static func distance(_ lhs: NSColor, _ rhs: NSColor) -> CGFloat {
+        let left = lhs.usingColorSpace(.sRGB) ?? lhs
+        let right = rhs.usingColorSpace(.sRGB) ?? rhs
+        return hypot(hypot(left.redComponent - right.redComponent, left.greenComponent - right.greenComponent), left.blueComponent - right.blueComponent)
     }
 }
 
@@ -489,4 +623,3 @@ public enum ClipNotchMotion: String, CaseIterable, Identifiable, Codable, Sendab
         }
     }
 }
-

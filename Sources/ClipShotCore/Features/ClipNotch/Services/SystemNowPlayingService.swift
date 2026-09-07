@@ -10,6 +10,8 @@ struct SystemMediaSnapshot: Decodable, Equatable {
     let isPlaying: Bool
     let duration: Double?
     let elapsedTime: Double?
+    let currentPlaybackDate: Double?
+    let sourcePID: Int32?
 }
 
 /// Reads system Now Playing metadata used by macOS media controls with live position tracking and seeking.
@@ -20,17 +22,20 @@ public final class SystemNowPlayingService: ObservableObject, @unchecked Sendabl
     @Published public private(set) var artist = ""
     @Published public private(set) var album = ""
     @Published public private(set) var artwork: NSImage?
+    @Published public private(set) var artworkPalette = ArtworkPalette.fallback
     @Published public private(set) var isPlaying = false
     @Published public private(set) var duration: Double = 0
     @Published public private(set) var elapsedTime: Double = 0
     @Published public private(set) var currentPosition: Double = 0
+    @Published public private(set) var sourceBundleIdentifier = ""
+    @Published public private(set) var sourceAppName = ""
 
     public var hasMedia: Bool { !title.isEmpty || !artist.isEmpty || artwork != nil }
     public var displayTitle: String {
         [title, artist].filter { !$0.isEmpty }.joined(separator: " — ")
     }
     public var effectiveDuration: Double {
-        duration > 0 ? duration : 210
+        max(0, duration)
     }
 
     private var timer: Timer?
@@ -63,12 +68,12 @@ public final class SystemNowPlayingService: ObservableObject, @unchecked Sendabl
     }
 
     public func seek(to seconds: Double) {
-        let clamped = max(0, min(seconds, effectiveDuration))
+        let clamped = duration > 0 ? max(0, min(seconds, duration)) : max(0, seconds)
         basePosition = clamped
         lastSyncTime = Date()
         currentPosition = clamped
         elapsedTime = clamped
-        SystemMediaController.seek(to: clamped)
+        SystemMediaController.seek(to: clamped, sourceBundleIdentifier: sourceBundleIdentifier)
     }
 
     public func skip(seconds: Double) {
@@ -80,8 +85,8 @@ public final class SystemNowPlayingService: ObservableObject, @unchecked Sendabl
         guard isPlaying else { return }
         let delta = Date().timeIntervalSince(lastSyncTime)
         let newPos = basePosition + delta
-        if effectiveDuration > 0 && newPos >= effectiveDuration {
-            currentPosition = effectiveDuration
+        if duration > 0 && newPos >= duration {
+            currentPosition = duration
         } else {
             currentPosition = newPos
         }
@@ -118,10 +123,18 @@ public final class SystemNowPlayingService: ObservableObject, @unchecked Sendabl
         let wasPlaying = isPlaying
         isPlaying = snapshot?.isPlaying ?? false
 
-        if let dur = snapshot?.duration, dur > 0 {
-            duration = dur
+        duration = max(0, snapshot?.duration ?? 0)
+        let playbackDate = snapshot?.currentPlaybackDate.flatMap {
+            $0 > 0 ? Date(timeIntervalSince1970: $0) : nil
         }
-        if let el = snapshot?.elapsedTime, el >= 0 {
+        let resolvedElapsed = Self.resolvedElapsed(
+            rawElapsed: snapshot?.elapsedTime,
+            playbackDate: playbackDate,
+            now: Date(),
+            isPlaying: isPlaying,
+            duration: duration
+        )
+        if let el = resolvedElapsed {
             elapsedTime = el
             basePosition = el
             lastSyncTime = Date()
@@ -130,10 +143,37 @@ public final class SystemNowPlayingService: ObservableObject, @unchecked Sendabl
             lastSyncTime = Date()
         }
 
+        if let pid = snapshot?.sourcePID,
+           let app = NSRunningApplication(processIdentifier: pid_t(pid)) {
+            sourceBundleIdentifier = app.bundleIdentifier ?? ""
+            sourceAppName = app.localizedName ?? ""
+        } else {
+            sourceBundleIdentifier = ""
+            sourceAppName = ""
+        }
+
         let artworkBase64 = snapshot?.artworkBase64 ?? ""
         guard artworkBase64 != currentArtworkBase64 else { return }
         currentArtworkBase64 = artworkBase64
         artwork = Data(base64Encoded: artworkBase64).flatMap(NSImage.init(data:))
+        artworkPalette = artwork.map(ArtworkPalette.colors(from:)) ?? ArtworkPalette.fallback
+    }
+
+    static func resolvedElapsed(
+        rawElapsed: Double?,
+        playbackDate: Date?,
+        now: Date,
+        isPlaying: Bool,
+        duration: Double
+    ) -> Double? {
+        let raw = rawElapsed.flatMap { $0.isFinite && $0 >= 0 ? $0 : nil }
+        var elapsed = raw
+        if isPlaying, let raw, let playbackDate {
+            let delta = now.timeIntervalSince(playbackDate)
+            if delta >= 0 { elapsed = raw + delta }
+        }
+        guard let elapsed else { return nil }
+        return duration > 0 ? min(elapsed, duration) : elapsed
     }
 
     private static let probeSource = #"""
@@ -141,6 +181,17 @@ public final class SystemNowPlayingService: ObservableObject, @unchecked Sendabl
     import Foundation
 
     let handle = dlopen("/System/Library/PrivateFrameworks/MediaRemote.framework/MediaRemote", RTLD_NOW)!
+    var sourcePID: Int32 = 0
+    if let pidSymbol = dlsym(handle, "MRMediaRemoteGetNowPlayingApplicationPID") {
+        typealias GetPID = @convention(c) (DispatchQueue, @escaping @convention(block) (Int32) -> Void) -> Void
+        let getPID = unsafeBitCast(pidSymbol, to: GetPID.self)
+        let pidSemaphore = DispatchSemaphore(value: 0)
+        getPID(.global(qos: .utility)) { pid in
+            sourcePID = pid
+            pidSemaphore.signal()
+        }
+        _ = pidSemaphore.wait(timeout: .now() + 1)
+    }
     typealias GetInfo = @convention(c) (DispatchQueue, @escaping @convention(block) (NSDictionary?) -> Void) -> Void
     let getInfo = unsafeBitCast(dlsym(handle, "MRMediaRemoteGetNowPlayingInfo"), to: GetInfo.self)
     let semaphore = DispatchSemaphore(value: 0)
@@ -154,7 +205,9 @@ public final class SystemNowPlayingService: ObservableObject, @unchecked Sendabl
             "artworkBase64": (info?["kMRMediaRemoteNowPlayingInfoArtworkData"] as? Data)?.base64EncodedString() ?? "",
             "isPlaying": ((info?["kMRMediaRemoteNowPlayingInfoPlaybackRate"] as? NSNumber)?.doubleValue ?? 0) > 0,
             "duration": duration,
-            "elapsedTime": elapsed
+            "elapsedTime": elapsed,
+            "currentPlaybackDate": (info?["kMRMediaRemoteNowPlayingInfoTimestamp"] as? Date)?.timeIntervalSince1970 ?? 0,
+            "sourcePID": sourcePID
         ]
         if let data = try? JSONSerialization.data(withJSONObject: payload) {
             FileHandle.standardOutput.write(data)

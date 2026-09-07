@@ -7,6 +7,8 @@ import Combine
 @MainActor
 public final class ClipNotchViewModel: ObservableObject {
     public static let shared = ClipNotchViewModel()
+    static let musicPlayerHoverOpenDelay = 0.08
+    static let musicPlayerHoverExitDelay = 0.14
 
     @Published public var currentState: ClipNotchState = .idle
     @Published public var isHovered: Bool = false
@@ -143,7 +145,7 @@ public final class ClipNotchViewModel: ObservableObject {
             if currentState == .quickActions {
                 showIdle()
             } else if currentState == .musicPlayer {
-                scheduleAutoCollapse(after: 0.25)
+                scheduleAutoCollapse(after: Self.musicPlayerHoverExitDelay)
             } else if case .screenshotPreview = currentState {
                 scheduleAutoCollapse(after: 1.4)
             } else if case .videoInterruptedByScreenshot = currentState {

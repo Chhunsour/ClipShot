@@ -6,6 +6,7 @@ import SwiftUI
 public struct ClipNotchSettingsView: View {
     @ObservedObject private var settings = AppSettings.shared
     @ObservedObject private var displayTracker = DisplayTrackingService.shared
+    @ObservedObject private var nowPlaying = SystemNowPlayingService.shared
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var isPreviewingAnimation = false
 

@@ -104,5 +104,8 @@ final class SettingsTests: XCTestCase {
             settings.clipNotchMotion = motion
             XCTAssertEqual(settings.clipNotchMotion, motion)
         }
+
+        settings.clipNotchColorway = .albumAura
+        XCTAssertEqual(AppSettings(defaults: testDefaults).clipNotchColorway, .albumAura)
     }
 }

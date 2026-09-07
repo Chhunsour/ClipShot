@@ -10,7 +10,10 @@ public struct ClipNotchRecentShelfView: View {
     let onClose: () -> Void
 
     @ObservedObject private var clipboardManager = ClipboardHistoryManager.shared
+    @ObservedObject private var settings = AppSettings.shared
     @State private var copiedItemId: UUID?
+    @State private var isRevealed = false
+    @State private var isCloseHovered = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     public var body: some View {
@@ -19,21 +22,37 @@ public struct ClipNotchRecentShelfView: View {
             clipboardSection
             capturesSection
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .opacity(reduceMotion || isRevealed ? 1 : 0)
+        .scaleEffect(reduceMotion || isRevealed ? 1 : 0.96, anchor: .top)
+        .offset(y: reduceMotion || isRevealed ? 0 : -4)
+        .animation(reduceMotion ? nil : .spring(response: 0.26, dampingFraction: 0.88), value: isRevealed)
+        .onAppear {
+            if !reduceMotion { DispatchQueue.main.async { isRevealed = true } }
+        }
+        .onDisappear { isRevealed = false }
     }
 
     @ViewBuilder
     private var headerBar: some View {
-        HStack(alignment: .center) {
-            HStack(spacing: 5) {
+        HStack(alignment: .center, spacing: 8) {
+            HStack(spacing: 7) {
                 Image(systemName: "sparkles.rectangle.stack")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(.white.opacity(0.85))
-                Text("Activity Shelf")
-                    .font(.system(size: 11, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
+                    .font(.system(size: 10.5, weight: .bold))
+                    .foregroundStyle(settings.clipNotchColorway.primaryAccent)
+                    .frame(width: 25, height: 25)
+                    .background(RoundedRectangle(cornerRadius: 7, style: .continuous).fill(settings.clipNotchColorway.primaryAccent.opacity(0.12)))
+
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("Activity Shelf")
+                        .font(.system(size: 11, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                    Text("Copy or reuse recent work")
+                        .font(.system(size: 7.5, weight: .medium, design: .rounded))
+                        .foregroundColor(.white.opacity(0.42))
+                }
             }
 
             Spacer()
@@ -45,22 +64,28 @@ public struct ClipNotchRecentShelfView: View {
                     Image(systemName: "arrow.right")
                         .font(.system(size: 8, weight: .bold))
                 }
-                .foregroundColor(.accentColor)
+                .foregroundStyle(settings.clipNotchColorway.primaryAccent)
+                .padding(.horizontal, 8)
+                .frame(height: 25)
+                .background(Capsule().fill(settings.clipNotchColorway.primaryAccent.opacity(0.11)))
+                .overlay(Capsule().stroke(settings.clipNotchColorway.primaryAccent.opacity(0.22), lineWidth: 0.6))
             }
             .buttonStyle(.plain)
             .help("Open full screenshot history")
+            .accessibilityLabel("Open history")
 
             Button(action: onClose) {
                 Image(systemName: "xmark")
                     .font(.system(size: 9, weight: .bold))
-                    .foregroundColor(.white.opacity(0.6))
-                    .padding(3)
-                    .background(Circle().fill(Color.white.opacity(0.1)))
+                    .foregroundColor(.white.opacity(isCloseHovered ? 0.95 : 0.58))
+                    .frame(width: 25, height: 25)
+                    .background(Circle().fill(Color.white.opacity(isCloseHovered ? 0.14 : 0.07)))
             }
             .buttonStyle(.plain)
             .help("Close shelf")
+            .accessibilityLabel("Close activity shelf")
+            .onHover { isCloseHovered = $0 }
         }
-        .padding(.horizontal, 2)
     }
 
     @ViewBuilder
@@ -76,6 +101,13 @@ public struct ClipNotchRecentShelfView: View {
                         .foregroundColor(.white.opacity(0.7))
                 }
 
+                Text("\(clipboardManager.items.count)")
+                    .font(.system(size: 7.5, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.48))
+                    .padding(.horizontal, 5)
+                    .frame(height: 14)
+                    .background(Capsule().fill(.white.opacity(0.07)))
+
                 Spacer()
 
                 if !clipboardManager.items.isEmpty {
@@ -88,25 +120,35 @@ public struct ClipNotchRecentShelfView: View {
                     }
                     .buttonStyle(.plain)
                     .help("Clear clipboard history")
+                    .accessibilityLabel("Clear clipboard history")
                 }
             }
             .padding(.horizontal, 2)
 
             let clipItems = Array(clipboardManager.items.prefix(3))
             if clipItems.isEmpty {
-                HStack(spacing: 6) {
+                HStack(spacing: 8) {
                     Image(systemName: "doc.on.clipboard")
-                        .font(.system(size: 10))
-                        .foregroundColor(.white.opacity(0.35))
-                    Text("No recent clipboard items")
-                        .font(.system(size: 10, weight: .regular))
-                        .foregroundColor(.white.opacity(0.45))
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundStyle(settings.clipNotchColorway.primaryAccent.opacity(0.75))
+                        .frame(width: 26, height: 26)
+                        .background(RoundedRectangle(cornerRadius: 7, style: .continuous).fill(settings.clipNotchColorway.primaryAccent.opacity(0.08)))
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text("Clipboard is empty")
+                            .font(.system(size: 9.5, weight: .semibold, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.72))
+                        Text("Copy text or an image and it will appear here")
+                            .font(.system(size: 8, weight: .regular, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.36))
+                            .lineLimit(1)
+                    }
                     Spacer()
                 }
-                .padding(.horizontal, 8)
+                .padding(.horizontal, 9)
                 .frame(maxWidth: .infinity)
-                .frame(height: 30)
-                .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(Color.white.opacity(0.04)))
+                .frame(height: 40)
+                .background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(Color.white.opacity(0.045)))
+                .overlay(RoundedRectangle(cornerRadius: 9, style: .continuous).stroke(.white.opacity(0.07), lineWidth: 0.6))
             } else {
                 HStack(spacing: 6) {
                     ForEach(clipItems) { item in
@@ -133,24 +175,52 @@ public struct ClipNotchRecentShelfView: View {
                 Text("Recent Captures")
                     .font(.system(size: 9.5, weight: .semibold, design: .rounded))
                     .foregroundColor(.white.opacity(0.7))
+
+                Text("\(items.count)")
+                    .font(.system(size: 7.5, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.48))
+                    .padding(.horizontal, 5)
+                    .frame(height: 14)
+                    .background(Capsule().fill(.white.opacity(0.07)))
             }
             .padding(.horizontal, 2)
 
             let captureItems = Array(items.prefix(4))
             if captureItems.isEmpty {
-                HStack(spacing: 6) {
-                    Image(systemName: "photo.on.rectangle.angled")
-                        .font(.system(size: 10))
-                        .foregroundColor(.white.opacity(0.35))
-                    Text("No recent captures")
-                        .font(.system(size: 10, weight: .regular))
-                        .foregroundColor(.white.opacity(0.45))
-                    Spacer()
+                Button {
+                    onClose()
+                    DispatchQueue.main.async {
+                        CaptureOverlayController.shared.showOverlay(initialMode: .area)
+                    }
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "camera.viewfinder")
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(settings.clipNotchColorway.primaryAccent)
+                            .frame(width: 26, height: 26)
+                            .background(RoundedRectangle(cornerRadius: 7, style: .continuous).fill(settings.clipNotchColorway.primaryAccent.opacity(0.11)))
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text("Take your first screenshot")
+                                .font(.system(size: 9.5, weight: .semibold, design: .rounded))
+                                .foregroundStyle(.white.opacity(0.82))
+                            Text("Select an area to capture")
+                                .font(.system(size: 8, weight: .regular, design: .rounded))
+                                .foregroundStyle(.white.opacity(0.4))
+                        }
+                        Spacer()
+                        Image(systemName: "arrow.right")
+                            .font(.system(size: 8, weight: .bold))
+                            .foregroundStyle(settings.clipNotchColorway.primaryAccent.opacity(0.8))
+                    }
+                    .padding(.horizontal, 9)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 44)
+                    .background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(settings.clipNotchColorway.primaryAccent.opacity(0.055)))
+                    .overlay(RoundedRectangle(cornerRadius: 9, style: .continuous).stroke(settings.clipNotchColorway.primaryAccent.opacity(0.13), lineWidth: 0.7))
                 }
-                .padding(.horizontal, 8)
-                .frame(maxWidth: .infinity)
-                .frame(height: 38)
-                .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(Color.white.opacity(0.04)))
+                .buttonStyle(.plain)
+                .help("Capture an area")
+                .accessibilityLabel("Take a screenshot")
             } else {
                 HStack(spacing: 7) {
                     ForEach(captureItems) { item in
@@ -206,6 +276,7 @@ struct ClipboardHistoryItemCell: View {
         .buttonStyle(.plain)
         .onHover { isHovered = $0 }
         .help(tooltipText)
+        .accessibilityLabel(tooltipText)
     }
 
     @ViewBuilder
@@ -348,6 +419,7 @@ struct RecentThumbnailCell: View {
             thumbnail = HistoryManager.shared.loadThumbnail(for: item)
         }
         .help(item.fileName)
+        .accessibilityLabel("Use capture \(item.fileName)")
     }
 
     @ViewBuilder

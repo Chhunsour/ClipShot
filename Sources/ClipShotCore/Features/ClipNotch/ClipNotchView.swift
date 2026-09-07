@@ -7,6 +7,7 @@ public struct ClipNotchView: View {
     @ObservedObject private var viewModel = ClipNotchViewModel.shared
     @ObservedObject private var settings = AppSettings.shared
     @ObservedObject private var displayTracker = DisplayTrackingService.shared
+    @ObservedObject private var nowPlaying = SystemNowPlayingService.shared
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     @State private var hoverWorkItem: DispatchWorkItem?
@@ -209,7 +210,7 @@ public struct ClipNotchView: View {
         case .fileDropHover:
             return (Color.cyan, 0.10)
         case .recentShelf:
-            return (Color.mint, 0.06)
+            return (settings.clipNotchColorway.primaryAccent, 0.07)
         }
     }
 
@@ -276,7 +277,7 @@ public struct ClipNotchView: View {
         hoverWorkItem = item
         // Resizing an NSPanel briefly invalidates its tracking area. A delayed exit
         // lets the matching re-entry cancel that false event instead of oscillating.
-        let delay = hovering ? 0.1 : 0.3
+        let delay = hovering ? 0.06 : (viewModel.currentState == .musicPlayer ? 0.04 : 0.3)
         DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: item)
     }
 
