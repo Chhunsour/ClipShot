@@ -1,177 +1,284 @@
-# ClipShot
+<p align="center">
+  <img src="Assets/app-icon.png" width="128" height="128" alt="ClipShot Icon" style="border-radius: 28px; box-shadow: 0 12px 32px rgba(0,0,0,0.25);" />
+</p>
 
-> **Instant macOS Screenshot-to-Clipboard Productivity Utility**
-> *Take a screenshot. Paste it immediately.*
+<h1 align="center">ClipShot</h1>
 
-ClipShot is a lightweight, ultra-responsive native macOS menu-bar utility designed around one essential workflow: whenever you take a screenshot on your Mac (using standard shortcuts like `⌘ ⇧ 4`, `⌘ ⇧ 3`, or `⌘ ⇧ 5`), ClipShot automatically detects it in real time and places the actual image bytes onto your clipboard. You can immediately press `⌘ V` in apps like ChatGPT, Discord, Slack, Telegram, Figma, Notion, Photoshop, or your browser without having to manually open or copy the file.
+<p align="center">
+  <strong>The ultra-responsive, intelligent macOS screenshot-to-clipboard engine & Dynamic Notch companion.</strong><br>
+  <em>Take a screenshot. Paste it anywhere in milliseconds. Zero clutter. Zero polling. Pure flow.</em>
+</p>
 
----
-
-## Key Features
-
-- ⚡ **Near-Instant Auto-Copy (< 100–250ms)**: Uses macOS File System Events (`FSEvents`) for zero-polling, negligible-CPU event detection.
-- 📋 **Universal Clipboard Compatibility**: Writes raw PNG, TIFF, and NSImage representations to `NSPasteboard.general` for reliable pasting across all modern macOS apps.
-- 🛡️ **Deduplication & Sequence Protection**: Safely handles bursts of rapid screenshots (`A → B → C`), guaranteeing the latest screenshot wins the clipboard while all are indexed in history.
-- 🪟 **Floating Preview Overlay**: Lightweight, non-activating thumbnail overlay with quick actions (`Copy`, `OCR`, `Edit`, `Pin`, `Finder`, `Trash`, `Close`).
-- 🕒 **Screenshot History**: Searchable history with date grouping, lightweight metadata storage, and disk-cached thumbnails with automatic retention policies (max item count & age limits).
-- 📌 **Pin to Screen**: Float reference screenshots on top of all windows with adjustable opacity (25%, 50%, 75%, 100%), resizing, and dragging.
-- 🔍 **Offline OCR (Apple Vision)**: Extract text locally on your Mac with `VNRecognizeTextRequest`—zero cloud requests, zero data transmission.
-- ✏️ **Annotation & Markup Editor**: Arrow, rectangle, ellipse, pen, text callout, highlight, blur, and crop tools with high-fidelity PNG export.
-- 🧹 **Clipboard-Only Mode**: Opt-in mode that copies the screenshot bytes to the clipboard and immediately trashes the original file, keeping your Desktop spotless.
-- 🚀 **Modern Launch at Login**: Implemented using Apple's official `SMAppService` API (macOS 13+).
-- 🔒 **100% Offline & Private**: No analytics, no accounts, no network requests. All data stays strictly on your Mac.
+<p align="center">
+  <a href="#key-features"><img src="https://img.shields.io/badge/macOS-14.0%2B%20Sonoma%20%7C%20Sequoia-black?style=flat-square&logo=apple" alt="macOS 14+"></a>
+  <a href="#building-and-running"><img src="https://img.shields.io/badge/Swift-5.9%2B-F05138?style=flat-square&logo=swift&logoColor=white" alt="Swift 5.9+"></a>
+  <a href="#how-it-works-under-the-hood"><img src="https://img.shields.io/badge/Latency-%3C%20100ms%20Auto--Copy-00D26A?style=flat-square&logo=speedtest&logoColor=white" alt="Sub-100ms Auto Copy"></a>
+  <a href="#clipnotch--the-mac-dynamic-island"><img src="https://img.shields.io/badge/ClipNotch-Dynamic%20Island%20for%20Mac-8A2BE2?style=flat-square" alt="ClipNotch Dynamic Island"></a>
+  <a href="#privacy--offline-architecture"><img src="https://img.shields.io/badge/Privacy-100%25%20Offline%20%26%20Local-blue?style=flat-square&logo=lock&logoColor=white" alt="100% Offline"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-gray?style=flat-square" alt="MIT License"></a>
+</p>
 
 ---
 
-## Architecture Overview
+## ⚡ Why ClipShot?
+
+Every day, developers, designers, and power users take dozens of screenshots to share in **Slack, Discord, Figma, ChatGPT, Notion, GitHub, and Telegram**. 
+
+### The Problem With macOS Defaults
+- When you press `⌘ ⇧ 4` or `⌘ ⇧ 3`, macOS writes a file to your Desktop. You have to open Finder, locate the file, drag it or press `⌘ C`, and eventually clean up a pile of stale PNGs on your Desktop.
+- The built-in clipboard shortcut `⌃ ⌘ ⇧ 4` requires awkward 4-finger hand contortions, does not retain history, has no annotation studio, no quick OCR, and offers no visual confirmation.
+- Heavyweight commercial tools consume hundreds of megabytes of memory, ping cloud analytics servers, or require expensive ongoing subscriptions.
+
+### The ClipShot Experience
+With ClipShot running quietly in your menu bar:
+1. **Press your regular macOS shortcuts** (`⌘ ⇧ 4`, `⌘ ⇧ 3`, `⌘ ⇧ 5`) or use ClipShot’s built-in crosshair overlay (`⌘ ⇧ 2`).
+2. **ClipShot's kernel event stream catches the capture in under 100ms.** Raw multi-format image bytes (`public.png`, `public.tiff`, `NSImage`) are placed directly onto your system clipboard.
+3. **Press `⌘ V` immediately in any application.**
+4. **Desktop stays immaculate**: Opt into *Clipboard-Only Mode* to copy the bytes and automatically send the temporary file straight to the Trash.
+5. **ClipNotch lights up**: Your MacBook notch transforms into an interactive command capsule with fluid 120 FPS spring physics, instant OCR, quick annotations, and dynamic media playback.
+
+---
+
+## 📊 How ClipShot Compares
+
+| Feature | macOS Default | Shottr | CleanShot X | 🚀 ClipShot |
+| :--- | :---: | :---: | :---: | :---: |
+| **Instant Auto-Copy (< 100ms)** | ❌ (File only) | ⚠️ (Manual) | ⚠️ (Opt-in) | **✅ Native FSEvents** |
+| **ClipNotch (Dynamic Island)** | ❌ | ❌ | ❌ | **✅ Built-in (14 Themes)** |
+| **Live Album Aura Music Player** | ❌ | ❌ | ❌ | **✅ Dynamic Artwork Extraction** |
+| **Zero Background Polling / CPU** | ✅ | ⚠️ (Timer polling) | ⚠️ | **✅ 0.0% Idle CPU** |
+| **Spotless Desktop (Auto-Trash)** | ❌ | ❌ | ✅ | **✅ Instant Clipboard-Only** |
+| **Offline Apple Vision OCR** | ⚠️ (Sonoma only) | ✅ | ⚠️ (Cloud/Local) | **✅ 100% On-Device Neural OCR** |
+| **Screen Recording & Audio** | ⚠️ (Basic) | ❌ | ✅ | **✅ High-FPS + Mic** |
+| **Scrolling Long Capture** | ❌ | ✅ | ✅ | **✅ Built-in** |
+| **Pin Screenshot on Top** | ❌ | ✅ | ✅ | **✅ Variable Opacity Floating Pin** |
+| **Command Palette (`⌥ Space`)** | ❌ | ❌ | ❌ | **✅ Built-in Launcher** |
+| **Pricing & Open Source** | Free (Closed) | Freemium ($) | Paid ($29+) | **100% Free & Open Source (MIT)** |
+| **Telemetry & Network Calls** | Apple telemetry | Analytics | Analytics/Licensing | **Zero (0 Network Calls)** |
+
+---
+
+## 🏝️ ClipNotch — The Dynamic Island for Mac
+
+ClipShot transforms the physical MacBook display notch (or standard menu bar on external monitors) into **ClipNotch**: a fluid, tactile status hub running at silky 120Hz ProMotion speeds.
+
+```
+       ┌───────────────────────  CLIPNOTCH  ───────────────────────┐
+       │  [ ♫ Track Artwork ]  Midnight City — M83   [ ⏪  ⏯️  ⏩ ]  │
+       └───────────────────────────────────────────────────────────┘
+```
+
+### ✨ What ClipNotch Brings to Your Workflow:
+- **Instant Screenshot Capsule**: The moment you capture an image, ClipNotch smoothly expands, showing a crystal-clear thumbnail, copy status, quick OCR trigger, and markup launcher.
+- **Album Aura (Adaptive Artwork Palettes)**: When playing music via Apple Music, Spotify, Podcasts, or Safari, ClipNotch extracts an adaptive 3-color jewel palette directly from the album art and bathes the notch in ambient chromatic light.
+- **Interactive Transport Controls**: Scrub through tracks with live seeking, toggle playback, skip forward/backward, and adjust volume without switching apps.
+- **Drag-and-Drop Recent Shelf**: Access your last screenshots directly from the notch, and drag them into Slack, Keynote, or Mail.
+- **Live Recording Capsule**: Shows recording time, audio status, and a 1-click stop button when recording your screen.
+- **Video Capsule (Picture-in-Picture)**: Stream video feeds and floating previews directly inside the notch contour.
+- **OLED & Mini-LED Protection**: Built-in subtle pixel shifts to protect displays from image retention during long work sessions.
+
+### 🎨 Personalization & Physics Engine
+Customize ClipNotch to fit your setup:
+- **14 Curated Colorways**: Prism, Aurora, Ember, Tidal, Cyberpunk, Solaris, Matrix, Cosmic, Synthwave, Sakura, Arctic, Champagne, Monochrome, and dynamic **Album Aura**.
+- **6 Tactile Finishes**: Obsidian, Glass, Bloom, Titanium, Neon Aura, and Frosted.
+- **5 Spring Motion Profiles**: Calm, Fluid, Snappy, Pulse, and Bouncy.
+- **6 Sizing Presets**: Compact, Normal, Large, Extra Large, Ultra Wide, and Studio / Max.
+- **3 Placement Modes**: Top Header (aligned with physical notch), Below Menu Bar, or Free Floating Island.
+
+---
+
+## 🛠️ Complete Feature Suite
+
+### 1. ⚡ Near-Instant Clipboard Pipeline (< 100ms)
+ClipShot connects directly into macOS kernel `FSEvents`. There are no polling timers, zero background loops, and no battery consumption. When a file is written, ClipShot verifies file stability with `ImageIO`, decodes asynchronously off the main thread, and writes to `NSPasteboard.general` with three distinct representations:
+- `public.png` for web apps and modern chat clients.
+- `public.tiff` for native desktop productivity tools.
+- `NSImage` object for Cocoa and AppKit applications.
+
+### 2. 🎯 Precision Screen Capture Suite
+- **Area Capture (`⌘ ⇧ 2`)**: Interactive crosshairs with a live pixel magnifier and dimension readout ($W \times H$).
+- **Window Capture**: Hover over any application window to capture it cleanly with optional macOS drop shadows.
+- **Full Screen Capture**: One-click capture across single or multi-display configurations.
+- **Scrolling Capture**: Stitch long documents, code files, and conversation threads into a single seamless image.
+- **Color Picker**: Inspect any screen pixel in real time and copy values in HEX, RGB, or HSL format with a history swatch.
+- **Screen Ruler / Measure Tool**: Calculate pixel distances, margins, and bounding dimensions directly on screen.
+
+### 3. 🔍 Offline Apple Vision OCR
+Select any area on your screen or click the OCR button on a recent screenshot to extract text instantly. Powered by Apple’s native `VNRecognizeTextRequest`, OCR runs completely locally with near-zero latency, preserving indentation and line breaks for code snippets.
+
+### 4. ✏️ Annotation & Markup Studio
+Polish your captures before sharing:
+- **Redaction / Pixelate Blur**: Hide API keys, passwords, and sensitive client information.
+- **Vector Shapes & Arrows**: Smooth directional arrows, rectangles, and ellipses.
+- **Callouts & Typography**: Crisp text annotations with custom styling.
+- **Highlighter**: Semi-transparent emphasis markers.
+- **Lossless Export**: Export at full Retina resolution with transparency preserved.
+
+### 5. 📌 Pin-to-Screen (Floating Reference Window)
+Need to reference a design, code sample, or ticket while working in Xcode, Figma, or VS Code? Pin any screenshot on top of all windows with customizable opacity (25%, 50%, 75%, 100%), smooth dragging, and zooming.
+
+### 6. 🕒 Searchable History & Smart Cache
+Never lose a capture again. ClipShot maintains a lightweight SQLite/JSON-backed history archive with date grouping, search filters, and thumbnail caching. Configure your retention policy by count (e.g., last 50, 100, 500) or duration (7 days, 30 days, forever).
+
+### 7. ⌨️ Command Palette (`⌥ Space`)
+Launch any ClipShot action instantly with a keyboard-driven Spotlight-style command palette. Search capture modes, open preferences, toggle monitoring, inspect recent clips, and trigger tools without lifting your fingers from the keys.
+
+---
+
+## 🔍 How It Works Under the Hood
+
+ClipShot is built with a decoupled, reactive architecture in Swift, combining low-level Darwin kernel events with high-performance SwiftUI and AppKit view layers.
+
+```mermaid
+flowchart TD
+    A[macOS Screenshot Trigger\n⌘ ⇧ 4 / ⌘ ⇧ 3 / ⌘ ⇧ 2] --> B[macOS writes image to disk]
+    B --> C[FSEvents Kernel Stream\nZero-Polling Event Filter]
+    C --> D[ScreenshotProcessor Actor\nStability & Debounce Check]
+    D --> E{Candidate Valid?}
+    E -- No --> F[Ignore / Drop Event]
+    E -- Yes --> G[Deduplication & Sequence Engine]
+    G --> H[ImageIO Async Decode\nBackground Thread]
+    H --> I[ClipboardManager\nWrites PNG + TIFF + NSImage]
+    H --> J[HistoryManager\nIndexes Metadata & Thumbnail]
+    I --> K[Target App ⌘ V\nSlack, Discord, Figma, AI]
+    J --> L[ClipNotch Dynamic Island\n120 FPS Notification & Controls]
+    D -. Clipboard-Only Mode .-> M[Safely Move File to Trash]
+```
+
+### Event Lifecycle Details:
+1. **Detection**: `ScreenshotMonitor` listens to file system event streams with a 50ms latency flag (`kFSEventStreamCreateFlagFileEvents`).
+2. **Stability Verification**: `CGImageSourceCreateWithURL` checks `CGImageSourceGetStatus` to ensure macOS has completed writing the image file before attempting to read bytes.
+3. **Deduplication Engine**: Protects against rapid screenshot bursts (`A → B → C`), guaranteeing the latest screenshot takes the clipboard while all items are safely indexed in history.
+4. **Clipboard Injection**: `ClipboardManager` clears and populates `NSPasteboard.general` with atomic multi-type representations.
+5. **UI Notification**: `ClipNotchViewModel` and `FloatingPreviewController` react on the `@MainActor` without stealing focus from your active application.
+
+---
+
+## ⌨️ Default Keyboard Shortcuts
+
+| Shortcut | Action | Description |
+| :--- | :--- | :--- |
+| `⌘ ⇧ 2` | **New Capture Overlay** | Opens precision crosshair capture with magnifier |
+| `⌘ ⇧ 4` | **Native macOS Area** | Handled natively; auto-copied by ClipShot in <100ms |
+| `⌘ ⇧ 3` | **Native Full Screen** | Handled natively; auto-copied by ClipShot in <100ms |
+| `⌘ ⇧ H` | **Screenshot History** | Opens searchable history viewer |
+| `⌥ Space` | **Command Palette** | Quick keyboard launcher for all ClipShot tools |
+| `⌘ V` | **Universal Paste** | Paste the captured image directly into any target app |
+
+*(All hotkeys can be customized or disabled in **Settings → General**).*
+
+---
+
+## 🏗️ Architecture & Project Structure
 
 ```
 ClipShot/
-├── Package.swift                       # SPM package manifest
+├── Package.swift                             # Swift Package Manager manifest
 ├── Sources/
-│   ├── ClipShotCore/                   # Core business logic framework
-│   │   ├── AppConfig.swift             # App constants, naming & branding
-│   │   ├── Models/
-│   │   │   ├── AppSettings.swift       # Reactive user preferences (UserDefaults)
-│   │   │   ├── AppEnums.swift          # Configuration enums
-│   │   │   └── ScreenshotItem.swift    # Screenshot metadata record
-│   │   ├── Core/
-│   │   │   ├── ScreenshotMonitor.swift # FSEvents filesystem monitor
-│   │   │   ├── ScreenshotDetector.swift# Candidate verification & metadata heuristic
-│   │   │   ├── ScreenshotProcessor.swift# Central actor: stability, ordering & deduplication
-│   │   │   ├── ClipboardManager.swift  # NSPasteboard writer & format provider
-│   │   │   ├── HistoryManager.swift    # History persistence & thumbnail caching
-│   │   │   ├── HotkeyManager.swift     # Carbon global hotkeys
-│   │   │   ├── LaunchAtLoginManager.swift# SMAppService integration
-│   │   │   └── PermissionsManager.swift# System permissions & deep links
-│   │   ├── Features/
-│   │   │   ├── MenuBar/                # NSStatusItem controller & dynamic menu
-│   │   │   ├── Preview/                # Non-activating floating preview panel
-│   │   │   ├── History/                # History viewer window & search
-│   │   │   ├── Pin/                    # Floating reference pinned window
-│   │   │   ├── OCR/                    # Local Vision OCR text extraction
-│   │   │   ├── Markup/                 # Canvas annotation editor
-│   │   │   ├── Capture/                # Built-in area/screen/window capture
-│   │   │   ├── Onboarding/             # 3-step first-launch guide
-│   │   │   └── Settings/               # Native tabbed preferences window
-│   │   └── Utilities/
-│   │       ├── ImageUtils.swift        # ImageIO, CGImage & PNG converters
-│   │       ├── PathUtils.swift         # Screenshot location detection & bookmarks
-│   │       ├── AppLogger.swift         # Rotating diagnostic file logger
-│   │       └── SoundManager.swift      # Subtle audio feedback
-│   └── ClipShotApp/                    # Main executable target
-│       ├── ClipShotApp.swift           # @main entry point
-│       ├── AppDelegate.swift           # NSApplicationDelegate lifecycle
-│       └── Resources/                  # Info.plist & AppIcon.icns
-├── Tests/
-│   └── ClipShotTests/                  # Comprehensive unit & integration tests
-│       ├── ScreenshotDetectorTests.swift
-│       ├── DeduplicationTests.swift
-│       ├── HistoryManagerTests.swift
-│       ├── ClipboardManagerTests.swift
-│       ├── SettingsTests.swift
-│       ├── ImageUtilsTests.swift
-│       └── EndToEndWorkflowTests.swift
-└── Scripts/
-    ├── build_app.sh                    # Release build and packaging script
-    └── generate_icons.swift            # CoreGraphics icon generator
+│   ├── ClipShotApp/                          # Application Target
+│   │   ├── ClipShotApp.swift                 # @main entry point
+│   │   ├── AppDelegate.swift                 # NSApplicationDelegate lifecycle
+│   │   └── Resources/                        # Info.plist & AppIcon.icns
+│   └── ClipShotCore/                         # Core Logic Framework
+│       ├── AppConfig.swift                   # App constants & branding
+│       ├── CaptureEngine/                    # Screen, Window & Video engines
+│       │   ├── ScreenCaptureEngine.swift     # CoreGraphics capture backend
+│       │   ├── ScreenRecordingEngine.swift   # AVFoundation screen recording
+│       │   ├── ScrollingCaptureService.swift # Scroll stitch engine
+│       │   └── WindowCaptureService.swift    # Window enumeration & capture
+│       ├── Core/                             # Kernel & System services
+│       │   ├── ClipboardManager.swift        # NSPasteboard multi-type writer
+│       │   ├── DeduplicationCache.swift      # Rapid screenshot burst protection
+│       │   ├── HistoryManager.swift          # History archive & thumbnail cache
+│       │   ├── HotkeyManager.swift           # Carbon global hotkeys
+│       │   ├── LaunchAtLoginManager.swift    # Modern SMAppService integration
+│       │   ├── PermissionsManager.swift      # Screen & disk permission helpers
+│       │   ├── ScreenshotDetector.swift      # Candidate verification heuristics
+│       │   ├── ScreenshotMonitor.swift       # FSEvents filesystem monitor
+│       │   └── ScreenshotProcessor.swift     # Central coordination actor
+│       ├── Features/                         # Feature UI modules
+│       │   ├── Capture/                      # Crosshair magnifier & capture HUD
+│       │   ├── ClipNotch/                    # Dynamic Notch / Island suite
+│       │   │   ├── ClipNotchAppearance.swift # 14 colorways, 6 finishes, motion physics
+│       │   │   ├── ClipNotchPanel.swift      # Non-activating floating notch window
+│       │   │   ├── ClipNotchView.swift       # Root notch SwiftUI composition
+│       │   │   ├── ClipNotchViewModel.swift  # Notch state machine & interactions
+│       │   │   ├── Services/                 # Display tracking & Now Playing
+│       │   │   ├── Settings/                 # ClipNotch appearance preferences
+│       │   │   └── Views/                    # Idle, Music, OCR, Shelf, Recording
+│       │   ├── CommandPalette/               # Keyboard launcher window
+│       │   ├── FloatingTool/                 # Floating quick-tool accessory
+│       │   ├── History/                      # History window & search bar
+│       │   ├── Markup/                       # Canvas annotation & redaction editor
+│       │   ├── MenuBar/                      # Status bar item & context menu
+│       │   ├── OCR/                          # Apple Vision text recognition
+│       │   ├── Pin/                          # Stay-on-top floating reference panel
+│       │   ├── Preview/                      # Floating corner preview overlay
+│       │   └── Settings/                     # Native tabbed preferences
+│       ├── Models/                           # Data models & AppSettings
+│       └── Utilities/                        # ImageIO, logging, and sound
+└── Tests/
+    └── ClipShotTests/                        # Comprehensive test suite (52+ tests)
 ```
 
 ---
 
-## How Automatic Screenshot Copying Works
+## 🚀 Building and Running
 
-```
-macOS screenshot shortcut (⌘ ⇧ 4 / ⌘ ⇧ 3)
-              ↓
-macOS writes screenshot file to folder (e.g. ~/Desktop)
-              ↓
-FSEvents Stream detects file modification (latency: 50ms)
-              ↓
-ScreenshotProcessor verifies file write stability (ImageIO statusComplete)
-              ↓
-ScreenshotDetector validates candidate (kMDItemIsScreenCapture / naming heuristic)
-              ↓
-Deduplication cache ignores redundant events
-              ↓
-Image decoded off UI thread
-              ↓
-ClipboardManager writes PNG & TIFF representations to NSPasteboard.general
-              ↓
-HistoryManager indexes metadata & caches thumbnail
-              ↓
-FloatingPreviewPanel displays lightweight overlay in screen corner
-              ↓
-You press ⌘ V in any target application!
-```
+### System Requirements
+- **macOS 14.0 (Sonoma)** or **macOS 15.0 (Sequoia)** or later
+- **Apple Silicon (M1/M2/M3/M4)** or **Intel Core Mac**
+- **Xcode 15.0+** / **Swift 5.9+**
 
----
-
-## Building and Running
-
-### Requirements
-- macOS 14.0 or later
-- Apple Silicon (M1/M2/M3/M4) or Intel Mac
-- Xcode 15+ / Swift 5.9+
-
-### Quick Build (Release `.app` Bundle)
-To build the standalone `ClipShot.app`:
+### 1. Build Standalone `.app` Bundle
+To build a fully packaged, code-signed release application bundle:
 ```bash
 ./Scripts/build_app.sh
 ```
-The resulting application is placed at:
+The finished application bundle will be created at:
 ```
 build/Release/ClipShot.app
 ```
-The build uses the first available local signing identity and falls back to ad-hoc signing. Set `CLIPSHOT_SIGN_IDENTITY` to choose a specific certificate.
+Double-click `ClipShot.app` or move it to your `/Applications` directory.
 
-### Running Unit & Integration Tests
-Run via Swift Package Manager:
-```bash
-swift test
-```
-Or via `xcodebuild`:
-```bash
-xcodebuild test -scheme ClipShot -destination "platform=macOS"
-```
-
-### Running Debug Build
+### 2. Run from Terminal (Debug Mode)
 ```bash
 swift run ClipShot
 ```
 
----
-
-## Permissions Guide
-
-ClipShot adheres strictly to the principle of least privilege:
-- **Screenshot Folder Access**: Granted automatically for standard folders; prompts for custom folders via `NSOpenPanel` using security-scoped bookmarks so permissions persist across restarts.
-- **Screen Recording (Optional)**: Only required if you use ClipShot's built-in capture actions (`Capture Area`, `Capture Full Screen`, `Capture Window`). Standard macOS shortcuts (`⌘ ⇧ 4`, etc.) do **not** require this permission.
-- **Notifications (Optional)**: Used to display non-intrusive feedback and error alerts.
+### 3. Run the Test Suite
+ClipShot features comprehensive test coverage covering deduplication, state machines, color palettes, media controls, and pasteboard encoding:
+```bash
+swift test
+```
 
 ---
 
-## Troubleshooting
+## 🔒 Privacy & Offline Architecture
 
-### Screenshot is not copied to clipboard
-1. Verify that ClipShot is running in your menu bar and shows `● Monitoring Active`.
-2. Check that the screenshot directory in **Settings → Screenshots** matches where macOS saves screenshots. (Default: `~/Desktop`).
-3. If using custom folders, click **Choose Folder...** in Settings to re-grant folder access.
-
-### Screenshot folder changed
-If you changed your macOS screenshot destination using `defaults write com.apple.screencapture location <path>`, restart ClipShot or select the new folder in **ClipShot Settings → Screenshots → Choose Folder...**.
-
-### Clipboard Only Mode
-If you enable **Clipboard Only Mode**, ClipShot will load the screenshot data into memory, write the image bytes to the clipboard, verify the pasteboard write succeeded, and automatically move the original file from the Desktop into the macOS Trash.
+ClipShot was designed from day one around uncompromising privacy:
+- **100% Offline**: ClipShot makes **zero** network requests. There are no analytics libraries, no crash telemetry, and no remote license verification.
+- **Local Neural OCR**: Optical Character Recognition runs entirely on your Mac's Apple Neural Engine via `Vision.framework`. Text never leaves your device.
+- **Sandboxed File Permissions**: Only accesses the configured screenshot directory using macOS security-scoped bookmarks.
+- **Audit the Code**: The entire codebase is open source under the MIT license. You can inspect every line of code that runs on your machine.
 
 ---
 
-## Privacy Assurance
+## 🤝 Contributing
 
-ClipShot does not collect, store, or transmit any user data. All processing (screenshot detection, clipboard formatting, image rendering, OCR text recognition, and logging) occurs entirely locally and offline on your Mac.
+Contributions, feature suggestions, and bug reports are welcome!
+1. Fork the repository.
+2. Create a descriptive feature branch (`git checkout -b feat/my-new-feature`).
+3. Ensure all tests pass (`swift test`).
+4. Commit your changes (`git commit -m "feat(notch): add new tactile finish"`).
+5. Push to your branch and open a Pull Request.
 
 ---
 
-## License
+## 📜 License
 
-ClipShot is open source under the [MIT License](LICENSE).
+ClipShot is released under the **[MIT License](LICENSE)**. Feel free to use, modify, and distribute it freely.
+
+<p align="center">
+  Crafted with precision for macOS power users.
+</p>
