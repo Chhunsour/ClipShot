@@ -36,7 +36,7 @@ if [ -f "$PROJECT_ROOT/Sources/ClipShotApp/Resources/AppIcon.icns" ]; then
 fi
 
 SIGN_IDENTITY="${CLIPSHOT_SIGN_IDENTITY:-$(security find-identity -v -p codesigning | awk -F '"' '/^[[:space:]]*[0-9]+\)/ { print $2; exit }')}"
-if [ -n "$SIGN_IDENTITY" ] && security find-identity -v -p codesigning | rg -Fq "\"$SIGN_IDENTITY\""; then
+if [ -n "$SIGN_IDENTITY" ] && security find-identity -v -p codesigning | grep -Fq "\"$SIGN_IDENTITY\""; then
     echo "==> Signing ClipShot.app with stable identity..."
 else
     echo "==> Stable identity unavailable; using ad-hoc signing..."
