@@ -23,6 +23,10 @@ To build and package the production `.app` bundle:
 ```bash
 ./Scripts/build_app.sh
 ```
+To view available options and code signing flags:
+```bash
+./Scripts/build_app.sh --help
+```
 The output will be placed in `build/Release/ClipShot.app`.
 
 ### 2. Generating App Icons
