@@ -26,4 +26,21 @@ final class VideoCapsuleTests: XCTestCase {
         XCTAssertEqual(VideoCapsuleSize.medium.dimensions.width, 360)
         XCTAssertEqual(VideoCapsuleSize.large.dimensions.width, 480)
     }
+
+    func testVideoScalingModeCases() {
+        let expected: [VideoScalingMode] = [.fit, .fill, .original]
+        XCTAssertEqual(VideoScalingMode.allCases, expected)
+        for mode in VideoScalingMode.allCases {
+            XCTAssertEqual(mode.id, mode.rawValue)
+        }
+    }
+
+    func testVideoCapsuleDisplayTitleFallback() {
+        let model = VideoCapsuleModel(
+            windowID: 101,
+            appName: "Safari",
+            windowTitle: ""
+        )
+        XCTAssertEqual(model.displayTitle, "Safari")
+    }
 }
