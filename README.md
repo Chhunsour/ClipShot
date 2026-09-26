@@ -253,6 +253,9 @@ ClipShot features comprehensive test coverage covering deduplication, state mach
 swift test
 ```
 
+### 4. macOS System Permissions
+ClipShot requires standard macOS Screen Recording and Files & Folders permissions to capture pixels and detect screenshot events. See the **[Permissions Guide](docs/PERMISSIONS.md)** for detailed setup instructions and troubleshooting tips.
+
 ---
 
 ## 🔒 Privacy & Offline Architecture
