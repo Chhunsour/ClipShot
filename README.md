@@ -258,6 +258,8 @@ swift test
 ### 4. macOS System Permissions
 ClipShot requires standard macOS Screen Recording and Files & Folders permissions to capture pixels and detect screenshot events. See the **[Permissions Guide](docs/PERMISSIONS.md)** for detailed setup instructions and troubleshooting tips.
 
+*(For advanced build flags, test filters, custom code signing, and diagnostic scripts, see the **[CLI & Testing Guide](docs/CLI_AND_TESTING.md)**).*
+
 ---
 
 ## 🔒 Privacy & Offline Architecture
