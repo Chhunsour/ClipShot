@@ -154,6 +154,8 @@ flowchart TD
 4. **Clipboard Injection**: `ClipboardManager` clears and populates `NSPasteboard.general` with atomic multi-type representations.
 5. **UI Notification**: `ClipNotchViewModel` and `FloatingPreviewController` react on the `@MainActor` without stealing focus from your active application.
 
+*(For in-depth explanations of actor isolation, multi-type pasteboard injection, and non-activating NSPanel window levels, see the **[Architecture Deep-Dive](docs/ARCHITECTURE.md)**).*
+
 ---
 
 ## ⌨️ Default Keyboard Shortcuts
