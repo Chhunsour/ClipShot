@@ -31,7 +31,7 @@ We welcome contributions of all kinds: bug fixes, documentation improvements, ne
    ```bash
    swift test
    ```
-   All 52+ unit and integration tests should pass before submitting any changes.
+   All 120+ unit and integration tests should pass before submitting any changes.
 
 4. **Run in Debug Mode**:
    ```bash
@@ -42,7 +42,7 @@ We welcome contributions of all kinds: bug fixes, documentation improvements, ne
    ```bash
    ./Scripts/build_app.sh
    ```
-   The built bundle will reside at `build/Release/ClipShot.app`.
+   The built bundle will reside at `.build-app/ClipShot.app`.
 
 ---
 
@@ -70,6 +70,15 @@ When writing or reviewing code for ClipShot, please adhere to these core princip
 2. **Zero-Polling Efficiency**: Filesystem monitoring is event-driven via `FSEvents`. Never introduce background polling loops or timers that wake the CPU unnecessarily.
 3. **Thread Safety & Swift Concurrency**: Use Swift Concurrency (`actor`, `@MainActor`, `async/await`) properly. UI interactions must always happen on the `@MainActor`.
 4. **Resilient Non-Blocking UX**: Clipboard injection and image decoding must remain off the main thread so user workflows are never blocked.
+
+---
+
+## 🎨 Swift Code Style & Conventions
+
+- **API Design Guidelines**: Adhere to Apple's official [Swift API Design Guidelines](https://www.swift.org/documentation/api-design-guidelines/).
+- **Documentation Comments**: Document public types, protocols, and methods using triple-slash doc comments (`///`).
+- **Immutability First**: Default to `let` for variables and value types (`struct`, `enum`) for data models.
+- **Safety & Optionals**: Avoid force-unwrapping (`!`) in production code; use `guard let`, `if let`, or throwing error flows.
 
 ---
 
