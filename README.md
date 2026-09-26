@@ -267,7 +267,8 @@ ClipShot was designed from day one around uncompromising privacy:
 
 ## 🤝 Contributing
 
-Contributions, feature suggestions, and bug reports are welcome!
+Contributions, feature suggestions, and bug reports are welcome! Please check out our [Contributing Guidelines](CONTRIBUTING.md) for details on architecture principles and development workflow.
+
 1. Fork the repository.
 2. Create a descriptive feature branch (`git checkout -b feat/my-new-feature`).
 3. Ensure all tests pass (`swift test`).
