@@ -23,6 +23,34 @@ final class DisplayTrackingTests: XCTestCase {
         XCTAssertTrue(display.displayName.contains("Portable Monitor"))
     }
 
+    func testDisplayIdentifierMainDisplayFormatting() {
+        let display = DisplayIdentifier(
+            id: "main-screen",
+            name: "Built-in Retina Display",
+            directDisplayID: 0,
+            frame: CGRect(x: 0, y: 0, width: 1728, height: 1117),
+            visibleFrame: CGRect(x: 0, y: 0, width: 1728, height: 1085),
+            scaleFactor: 2.0,
+            isMain: true
+        )
+        XCTAssertEqual(display.displayName, "Built-in Retina Display (Main Display)")
+    }
+
+    func testDisplayIdentifierCodableRoundTrip() throws {
+        let original = DisplayIdentifier(
+            id: "disp-99",
+            name: "Studio Display",
+            directDisplayID: 42,
+            frame: CGRect(x: 0, y: 0, width: 2560, height: 1440),
+            visibleFrame: CGRect(x: 0, y: 0, width: 2560, height: 1400),
+            scaleFactor: 2.0,
+            isMain: false
+        )
+        let data = try JSONEncoder().encode(original)
+        let decoded = try JSONDecoder().decode(DisplayIdentifier.self, from: data)
+        XCTAssertEqual(original, decoded)
+    }
+
     func testNotchOriginCalculationTopHeader() {
         let service = DisplayTrackingService.shared
         let size = CGSize(width: 100, height: 32)
