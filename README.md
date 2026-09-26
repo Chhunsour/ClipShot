@@ -20,6 +20,35 @@
 
 ---
 
+## 📚 Documentation Hub
+
+Explore in-depth documentation guides for ClipShot:
+
+| Guide | Description |
+| :--- | :--- |
+| **[ClipNotch Guide](docs/CLIPNOTCH.md)** | Dynamic Notch companion, 14 colorways, 6 finishes, motion physics. |
+| **[Architecture Deep-Dive](docs/ARCHITECTURE.md)** | Kernel `FSEvents`, actor isolation, atomic multi-type pasteboard writes. |
+| **[Permissions Setup](docs/PERMISSIONS.md)** | macOS Screen Recording and file permission setup and troubleshooting. |
+| **[Keyboard Shortcuts](docs/KEYBOARD_SHORTCUTS.md)** | Global hotkeys, crosshairs navigation, and pixel nudge controls. |
+| **[CLI & Testing](docs/CLI_AND_TESTING.md)** | Terminal debugging, SPM test filters, and diagnostic scripts. |
+| **[Apple Vision OCR](docs/OCR_GUIDE.md)** | On-device neural OCR, code snippet preservation, and languages. |
+| **[Color Picker Guide](docs/COLOR_PICKER.md)** | Precision pixel magnifier, HEX / RGB / HSL / Display P3 formats. |
+| **[Measurement & Ruler](docs/MEASUREMENT_TOOL.md)** | On-screen Euclidean distance calculation and bounding margins. |
+| **[Annotation Studio](docs/ANNOTATION_STUDIO.md)** | Vector arrows, blur & pixelate redactions, step badges, typography. |
+| **[Floating Pin](docs/FLOATING_PIN.md)** | Stay-on-top reference windows with variable transparency. |
+| **[History & Cache](docs/HISTORY_ARCHIVE.md)** | Searchable capture archive, thumbnail caching, and pruning rules. |
+| **[Command Palette](docs/COMMAND_PALETTE.md)** | Spotlight-style launcher (`⌥ Space`) and fuzzy search. |
+| **[Screen Recording](docs/RECORDING_GUIDE.md)** | Hardware-accelerated MP4 video and animated GIF capture. |
+| **[Scrolling Capture](docs/SCROLLING_CAPTURE.md)** | Vertical frame stitching for long documents and code files. |
+| **[Troubleshooting](docs/TROUBLESHOOTING.md)** | Diagnostic steps, TCC permission resets, and log inspection. |
+| **[Configuration Reference](docs/CONFIGURATION.md)** | Complete `AppSettings` keys, defaults, and `UserDefaults` mapping. |
+| **[Frequently Asked Questions](docs/FAQ.md)** | Privacy guarantees, battery efficiency, and hardware compatibility. |
+| **[Accessibility (a11y)](docs/ACCESSIBILITY.md)** | VoiceOver support, keyboard accessibility, and reduced motion. |
+| **[Localization](docs/LOCALIZATION.md)** | Guide for contributing multi-language translations. |
+| **[Project Roadmap](docs/ROADMAP.md)** | Planned features, community requests, and architectural non-goals. |
+
+---
+
 ## ⚡ Why ClipShot?
 
 Every day, developers, designers, and power users take dozens of screenshots to share in **Slack, Discord, Figma, ChatGPT, Notion, GitHub, and Telegram**. 
