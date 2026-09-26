@@ -4,6 +4,19 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+    echo "Usage: $0 [options]"
+    echo ""
+    echo "Builds and packages ClipShot into a standalone macOS Release .app bundle."
+    echo ""
+    echo "Options:"
+    echo "  -h, --help    Show this help message and exit"
+    echo ""
+    echo "Environment Variables:"
+    echo "  CLIPSHOT_SIGN_IDENTITY  Override codesign identity (defaults to auto-detected Developer ID or ad-hoc '-')"
+    exit 0
+fi
+
 echo "==> Building ClipShot (Release)..."
 cd "$PROJECT_ROOT"
 swift build -c release
