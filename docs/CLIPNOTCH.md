@@ -2,6 +2,10 @@
 
 ClipShot transforms the physical MacBook display notch (or standard menu bar on external monitors) into **ClipNotch**: a fluid, tactile status capsule running at 120Hz ProMotion speeds.
 
+<p align="center">
+  <img src="../Assets/screenshots/clipnotch-dual-capsule.png" width="560" alt="ClipNotch Dual Capsule" style="border-radius: 8px;" />
+</p>
+
 ---
 
 ## 🌟 Interactive Capsules
@@ -15,11 +19,23 @@ ClipNotch dynamically shifts states based on what you are doing:
 5. **Screen Recording Capsule**: Shows an elapsed duration timer, live audio wave animation, and a quick-stop action button during screen captures.
 6. **Video Capsule (Picture-in-Picture)**: Embeds compact video playback streams directly within the notch contour.
 
+<div align="center">
+
+| 🎵 **Music & Now Playing Player** | 📂 **Recent Captures & Clipboard Shelf** |
+| :---: | :---: |
+| <img src="../Assets/screenshots/clipnotch-music-player.png" width="400" alt="Music Player Capsule" style="border-radius: 8px;" /> | <img src="../Assets/screenshots/clipnotch-activity-shelf.png" width="400" alt="Activity Shelf" style="border-radius: 8px;" /> |
+
+</div>
+
 ---
 
 ## 🎨 Themes & Customization
 
 ClipNotch can be fully tailored in **ClipShot Settings → ClipNotch**.
+
+<p align="center">
+  <img src="../Assets/screenshots/clipshot-settings-colorways.png" width="560" alt="ClipNotch Settings Colorways & Finishes" style="border-radius: 8px;" />
+</p>
 
 ### 1. Curated Colorways (14 Palettes)
 Each colorway provides an energetic 3-color palette driving the notch's glowing rail and interactive controls:

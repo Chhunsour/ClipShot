@@ -10,6 +10,7 @@
 </p>
 
 <p align="center">
+  <a href="#-showcase--preview"><img src="https://img.shields.io/badge/Preview-Screenshots-FF6B6B?style=flat-square" alt="Preview Screenshots"></a>
   <a href="#system-requirements"><img src="https://img.shields.io/badge/macOS-14.0%2B%20Sonoma%20%7C%20Sequoia-black?style=flat-square&logo=apple" alt="macOS 14+"></a>
   <a href="#building-and-running"><img src="https://img.shields.io/badge/Swift-5.9%2B-F05138?style=flat-square&logo=swift&logoColor=white" alt="Swift 5.9+"></a>
   <a href="#how-it-works-under-the-hood"><img src="https://img.shields.io/badge/Latency-%3C%20100ms%20Auto--Copy-00D26A?style=flat-square&logo=speedtest&logoColor=white" alt="Sub-100ms Auto Copy"></a>
@@ -17,6 +18,31 @@
   <a href="#privacy--offline-architecture"><img src="https://img.shields.io/badge/Privacy-100%25%20Offline%20%26%20Local-blue?style=flat-square&logo=lock&logoColor=white" alt="100% Offline"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-gray?style=flat-square" alt="MIT License"></a>
 </p>
+
+---
+
+## 📸 Showcase & Preview
+
+<p align="center">
+  <img src="Assets/screenshots/desktop-overview.jpg" alt="ClipShot Desktop Overview with Dynamic Notch" width="100%" style="border-radius: 12px; box-shadow: 0 16px 40px rgba(0,0,0,0.3);" />
+</p>
+<p align="center">
+  <em>ClipShot running natively on macOS with the dynamic ClipNotch capsule seamlessly integrated into the MacBook display notch.</em>
+</p>
+
+<div align="center">
+
+| 🎵 **Dynamic Notch Capsule** | 🎶 **Album Aura Media Player** |
+| :---: | :---: |
+| <img src="Assets/screenshots/clipnotch-dual-capsule.png" width="460" alt="ClipNotch Dual Capsule: Music & Text Copied" style="border-radius: 8px;" /> | <img src="Assets/screenshots/clipnotch-music-player.png" width="460" alt="ClipNotch Expanded Media Player" style="border-radius: 8px;" /> |
+| **Instant feedback**: Simultaneous track playback & screenshot copy confirmation pill | **Full media control**: Dynamic jewel artwork glow, live seeking bar, and playback controls |
+
+| 📋 **Activity Shelf & Clipboard History** | 🎨 **Look & Feel Customization** |
+| :---: | :---: |
+| <img src="Assets/screenshots/clipnotch-activity-shelf.png" width="460" alt="ClipNotch Activity Shelf" style="border-radius: 8px;" /> | <img src="Assets/screenshots/clipshot-settings-colorways.png" width="460" alt="ClipShot Look and Feel Settings" style="border-radius: 8px;" /> |
+| **Fast reuse**: Access recent clipboard items and drag-and-drop screenshot captures | **14 Colorways & 6 Finishes**: Tailor palette colorways with live notch previews |
+
+</div>
 
 ---
 
@@ -94,11 +120,9 @@ With ClipShot running quietly in your menu bar:
 
 ClipShot transforms the physical MacBook display notch (or standard menu bar on external monitors) into **ClipNotch**: a fluid, tactile status hub running at silky 120Hz ProMotion speeds.
 
-```
-       ┌───────────────────────  CLIPNOTCH  ───────────────────────┐
-       │  [ ♫ Track Artwork ]  Midnight City — M83   [ ⏪  ⏯️  ⏩ ]  │
-       └───────────────────────────────────────────────────────────┘
-```
+<p align="center">
+  <img src="Assets/screenshots/clipnotch-dual-capsule.png" alt="ClipNotch Dynamic Island Capsule" width="560" style="border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.3);" />
+</p>
 
 ### ✨ What ClipNotch Brings to Your Workflow:
 - **Instant Screenshot Capsule**: The moment you capture an image, ClipNotch smoothly expands, showing a crystal-clear thumbnail, copy status, quick OCR trigger, and markup launcher.
@@ -109,6 +133,14 @@ ClipShot transforms the physical MacBook display notch (or standard menu bar on 
 - **Video Capsule (Picture-in-Picture)**: Stream video feeds and floating previews directly inside the notch contour.
 - **OLED & Mini-LED Protection**: Built-in subtle pixel shifts to protect displays from image retention during long work sessions.
 
+<div align="center">
+
+| 🎵 **Live Media Playback with Album Aura** | 📂 **Activity Shelf: Clipboard & Captures** |
+| :---: | :---: |
+| <img src="Assets/screenshots/clipnotch-music-player.png" width="460" alt="ClipNotch Album Aura Player" style="border-radius: 8px;" /> | <img src="Assets/screenshots/clipnotch-activity-shelf.png" width="460" alt="ClipNotch Activity Shelf" style="border-radius: 8px;" /> |
+
+</div>
+
 ### 🎨 Personalization & Physics Engine
 Customize ClipNotch to fit your setup:
 - **14 Curated Colorways**: Prism, Aurora, Ember, Tidal, Cyberpunk, Solaris, Matrix, Cosmic, Synthwave, Sakura, Arctic, Champagne, Monochrome, and dynamic **Album Aura**.
@@ -116,6 +148,10 @@ Customize ClipNotch to fit your setup:
 - **5 Spring Motion Profiles**: Calm, Fluid, Snappy, Pulse, and Bouncy.
 - **6 Sizing Presets**: Compact, Normal, Large, Extra Large, Ultra Wide, and Studio / Max.
 - **3 Placement Modes**: Top Header (aligned with physical notch), Below Menu Bar, or Free Floating Island.
+
+<p align="center">
+  <img src="Assets/screenshots/clipshot-settings-colorways.png" alt="ClipShot Look and Feel Settings" width="600" style="border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.3);" />
+</p>
 
 *(See the complete **[ClipNotch Guide](docs/CLIPNOTCH.md)** for hex palette specs and interactive state descriptions).*
 
