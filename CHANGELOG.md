@@ -31,9 +31,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `docs/ACCESSIBILITY.md`: VoiceOver support, keyboard accessibility, and reduced motion.
   - `docs/LOCALIZATION.md`: Guide for contributing multi-language translations.
   - `docs/ROADMAP.md`: Planned features, community requests, and architectural non-goals.
+  - `docs/BATTERY_AND_ENERGY.md`: App Nap, zero background polling, and 120Hz ProMotion power tuning.
+  - `docs/MULTI_MONITOR_SETUP.md`: Mixed-DPI Retina scaling, coordinate mapping, and display hot-plugging.
+  - `docs/CLI_COMMANDS_REFERENCE.md`: Complete reference of build scripts, flags, and diagnostic tools.
   - `Examples/README.md`: Developer recipes for extending and integrating with `ClipShotCore`.
+  - `Examples/`: Standalone runnable Swift scripts (`detect_screenshot_folder.swift`, `format_color_sample.swift`, `calculate_notch_geometry.swift`, `prune_screenshot_history.swift`).
   - `Scripts/README.md`: Index and usage instructions for all build and diagnostic automation scripts.
-- Over 20 comprehensive unit test suites covering models, enums, settings, and utility services.
+- Over 25 comprehensive unit test suites covering models, enums, settings, and utility services.
+- Updated `SECURITY.md` with active release support policy and entitlements architecture link.
+- Updated `CONTRIBUTING.md` with Swift code style guidelines and updated 120+ test suite count.
 - GitHub Actions CI workflow for macOS build, unit test execution, and bundle validation.
 - Dependabot configuration for GitHub Actions dependencies.
 - GitHub issue templates for bug reports, feature requests, and documentation improvements.

@@ -72,6 +72,9 @@ Explore in-depth documentation guides for ClipShot:
 | **[Accessibility (a11y)](docs/ACCESSIBILITY.md)** | VoiceOver support, keyboard accessibility, and reduced motion. |
 | **[Security & Entitlements](docs/SECURITY_AND_ENTITLEMENTS.md)** | Local privacy guarantees, TCC permissions, and hardened runtime. |
 | **[Performance Guide](docs/PERFORMANCE.md)** | Memory footprint, battery conservation, and ScreenCaptureKit streaming. |
+| **[Battery & Energy](docs/BATTERY_AND_ENERGY.md)** | App Nap, zero background polling, and 120Hz ProMotion power tuning. |
+| **[Multi-Monitor Setup](docs/MULTI_MONITOR_SETUP.md)** | Mixed-DPI Retina scaling, coordinate mapping, and display hot-plugging. |
+| **[CLI Script Reference](docs/CLI_COMMANDS_REFERENCE.md)** | Complete reference of build scripts, flags, and diagnostic tools. |
 | **[Developer Examples](Examples/README.md)** | Standalone Swift recipes and integration snippets for `ClipShotCore`. |
 | **[Localization](docs/LOCALIZATION.md)** | Guide for contributing multi-language translations. |
 | **[Project Roadmap](docs/ROADMAP.md)** | Planned features, community requests, and architectural non-goals. |
