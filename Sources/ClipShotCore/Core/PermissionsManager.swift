@@ -45,6 +45,8 @@ public final class PermissionsManager: ObservableObject {
     }
 
     public func checkNotificationAccess() {
+        // UNUserNotificationCenter requires a valid .app bundle host; skip in xctest / CLI runners
+        guard Bundle.main.bundleURL.pathExtension == "app" else { return }
         UNUserNotificationCenter.current().getNotificationSettings { [weak self] settings in
             DispatchQueue.main.async {
                 self?.hasNotificationAccess = (settings.authorizationStatus == .authorized)
@@ -53,6 +55,7 @@ public final class PermissionsManager: ObservableObject {
     }
 
     public func requestNotificationAccess() {
+        guard Bundle.main.bundleURL.pathExtension == "app" else { return }
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { [weak self] granted, _ in
             DispatchQueue.main.async {
                 self?.hasNotificationAccess = granted
