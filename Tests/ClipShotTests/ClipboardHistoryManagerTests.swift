@@ -25,4 +25,33 @@ final class ClipboardHistoryManagerTests: XCTestCase {
 
         XCTAssertEqual(manager.items.count, 1)
     }
+
+    func testDeduplicatesConsecutiveCopies() {
+        let pasteboard = NSPasteboard(name: NSPasteboard.Name("clipshot-tests-dedup-\(UUID())"))
+        let manager = ClipboardHistoryManager(pasteboard: pasteboard)
+
+        pasteboard.clearContents()
+        pasteboard.setString("Duplicate text", forType: .string)
+        manager.checkForChanges()
+        XCTAssertEqual(manager.items.count, 1)
+
+        // Same content again
+        pasteboard.clearContents()
+        pasteboard.setString("Duplicate text", forType: .string)
+        manager.checkForChanges()
+        XCTAssertEqual(manager.items.count, 1)
+    }
+
+    func testClearHistory() {
+        let pasteboard = NSPasteboard(name: NSPasteboard.Name("clipshot-tests-clear-\(UUID())"))
+        let manager = ClipboardHistoryManager(pasteboard: pasteboard)
+
+        pasteboard.clearContents()
+        pasteboard.setString("Sample item", forType: .string)
+        manager.checkForChanges()
+        XCTAssertEqual(manager.items.count, 1)
+
+        manager.clearHistory()
+        XCTAssertTrue(manager.items.isEmpty)
+    }
 }
