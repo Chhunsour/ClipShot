@@ -10,10 +10,10 @@
 </p>
 
 <p align="center">
-  <a href="#key-features"><img src="https://img.shields.io/badge/macOS-14.0%2B%20Sonoma%20%7C%20Sequoia-black?style=flat-square&logo=apple" alt="macOS 14+"></a>
+  <a href="#system-requirements"><img src="https://img.shields.io/badge/macOS-14.0%2B%20Sonoma%20%7C%20Sequoia-black?style=flat-square&logo=apple" alt="macOS 14+"></a>
   <a href="#building-and-running"><img src="https://img.shields.io/badge/Swift-5.9%2B-F05138?style=flat-square&logo=swift&logoColor=white" alt="Swift 5.9+"></a>
   <a href="#how-it-works-under-the-hood"><img src="https://img.shields.io/badge/Latency-%3C%20100ms%20Auto--Copy-00D26A?style=flat-square&logo=speedtest&logoColor=white" alt="Sub-100ms Auto Copy"></a>
-  <a href="#clipnotch--the-mac-dynamic-island"><img src="https://img.shields.io/badge/ClipNotch-Dynamic%20Island%20for%20Mac-8A2BE2?style=flat-square" alt="ClipNotch Dynamic Island"></a>
+  <a href="#clipnotch--the-dynamic-island-for-mac"><img src="https://img.shields.io/badge/ClipNotch-Dynamic%20Island%20for%20Mac-8A2BE2?style=flat-square" alt="ClipNotch Dynamic Island"></a>
   <a href="#privacy--offline-architecture"><img src="https://img.shields.io/badge/Privacy-100%25%20Offline%20%26%20Local-blue?style=flat-square&logo=lock&logoColor=white" alt="100% Offline"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-gray?style=flat-square" alt="MIT License"></a>
 </p>
