@@ -22,9 +22,12 @@ final class AppConfigTests: XCTestCase {
     func testLoggingLimitsAndDefaults() {
         XCTAssertGreaterThan(AppConfig.maxLogFiles, 0)
         XCTAssertGreaterThan(AppConfig.maxLogFileSize, 1024 * 1024) // At least 1 MB
+        XCTAssertEqual(AppConfig.logSubsystem, AppConfig.bundleIdentifier)
         XCTAssertGreaterThan(AppConfig.defaultPreviewDuration, 0)
         XCTAssertGreaterThan(AppConfig.defaultHistoryLimit, 0)
         XCTAssertGreaterThan(AppConfig.defaultRetentionDays, 0)
         XCTAssertGreaterThan(AppConfig.maxFileStabilityRetries, 0)
+        XCTAssertGreaterThan(AppConfig.minFileStabilityCheckMs, 0)
+        XCTAssertEqual(AppConfig.recentEventCacheDuration, 5.0)
     }
 }
