@@ -19,6 +19,15 @@ final class HotkeyActionTests: XCTestCase {
     func testTitlesAreDescriptive() {
         for action in HotkeyAction.allCases {
             XCTAssertFalse(action.title.isEmpty)
+            XCTAssertEqual(action.id, action.rawValue)
+        }
+    }
+
+    func testHotkeyActionCodableRoundTrip() throws {
+        for action in HotkeyAction.allCases {
+            let data = try JSONEncoder().encode(action)
+            let decoded = try JSONDecoder().decode(HotkeyAction.self, from: data)
+            XCTAssertEqual(action, decoded)
         }
     }
 }
