@@ -31,6 +31,15 @@ final class ArtworkPaletteTests: XCTestCase {
         XCTAssertEqual(ArtworkPalette.colors(from: NSImage()).count, 3)
     }
 
+    func testFallbackHexColorsCountAndFormat() {
+        XCTAssertEqual(ArtworkPalette.fallbackHexColors.count, 3)
+        XCTAssertEqual(ArtworkPalette.fallback.count, 3)
+        for hex in ArtworkPalette.fallbackHexColors {
+            XCTAssertTrue(hex.hasPrefix("#"))
+            XCTAssertEqual(hex.count, 7)
+        }
+    }
+
     func testPrimaryColorPreservesArtworkHue() throws {
         let source = NSColor(srgbRed: 0.12, green: 0.67, blue: 0.35, alpha: 1)
         let context = try XCTUnwrap(CGContext(
