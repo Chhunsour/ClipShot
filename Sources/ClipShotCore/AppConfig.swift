@@ -22,5 +22,5 @@ public enum AppConfig {
 
     public static let recentEventCacheDuration: TimeInterval = 5.0
 
-    public static let helpURL = URL(string: "https://github.com/clipshot/clipshot")
+    public static let helpURL = URL(string: "https://github.com/Chhunsour/ClipShot")
 }
