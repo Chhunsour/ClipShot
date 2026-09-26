@@ -6,8 +6,9 @@ ClipShot is actively maintained. Security patches and fixes are provided for the
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 1.0.x   | :white_check_mark: |
-| < 1.0   | :x:                |
+| 1.3.x   | :white_check_mark: |
+| 1.2.x   | :white_check_mark: |
+| < 1.2   | :x:                |
 
 ---
 
@@ -18,6 +19,8 @@ ClipShot is engineered around strict local-first privacy:
 - **On-Device Neural Processing**: Text recognition (OCR) executes entirely on Apple Silicon / local CPU via Apple's native `Vision.framework`.
 - **Security-Scoped Bookmarks**: ClipShot uses AppKit security-scoped bookmarks to access only user-specified directories (e.g. Desktop or custom screenshot directories).
 - **Clipboard Isolation**: Pasteboard writes use standard `NSPasteboard` APIs and do not persist outside your system's pasteboard buffer.
+
+For full architectural details on sandboxing, hardened runtime, and macOS TCC entitlements, see the **[Security, Sandboxing, and Entitlements Guide](docs/SECURITY_AND_ENTITLEMENTS.md)**.
 
 ---
 
