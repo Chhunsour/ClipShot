@@ -68,3 +68,32 @@ Each colorway provides an energetic 3-color palette driving the notch's glowing 
 - **Top Header**: Anchored to the top bezel, aligning seamlessly with the hardware camera notch.
 - **Below Menu Bar**: Sits directly underneath the system menu bar.
 - **Free Floating Island**: Detached floating pill that can be positioned anywhere on screen.
+
+---
+
+## 🖥️ Multi-Display & External Monitors
+
+ClipShot includes an intelligent **`DisplayTrackingService`** that tracks active screen geometry across hot-plugged displays:
+
+- **Built-in MacBook Display**: If the active screen has a physical camera notch, ClipNotch anchors inside the hardware notch housing.
+- **External Monitors (Studio Display, Pro Display XDR, Ultrawide)**: When active on non-notch displays, ClipNotch smoothly transitions into a floating menu bar pill or centered header dock.
+- **Cursor Tracking**: ClipNotch can follow your active display based on mouse cursor focus or user configuration.
+
+---
+
+## 🎵 Album Aura Extraction
+
+When playing music in Apple Music or Spotify, the **Album Aura** colorway dynamically extracts a harmonized palette:
+1. **Dominant Tone**: Primary hue identified from artwork pixel distribution, applied to the main glowing rail.
+2. **Complementary Accent**: High-contrast secondary hue applied to action buttons and scrubbers.
+3. **Ambient Halo**: Desaturated warm or cool undertone illuminating the capsule backdrop.
+
+---
+
+## 👆 Gestures & Interaction Shortcuts
+
+- **Hover**: Expands idle notch to show full media title and playback controls.
+- **Click Preview**: Immediately launches the full Annotation & Markup studio.
+- **Drag & Drop**: Grab the screenshot thumbnail directly from the notch shelf and drag into Slack, Figma, Mail, or Finder.
+- **Escape / Click Outside**: Smoothly collapses the notch back to its idle state.
+
