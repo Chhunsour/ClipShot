@@ -26,6 +26,25 @@ final class ColorPickerTests: XCTestCase {
         XCTAssertEqual(service.rgbString(from: blackColor), "rgb(0, 0, 0)")
     }
 
+    func testHSLStringFormatting() {
+        let service = ColorPickerService.shared
+        let redColor = NSColor(srgbRed: 1.0, green: 0.0, blue: 0.0, alpha: 1.0)
+        let hsl = service.hslString(from: redColor)
+        XCTAssertTrue(hsl.hasPrefix("hsl("))
+        XCTAssertTrue(hsl.hasSuffix("%)"))
+
+        let blackColor = NSColor(srgbRed: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)
+        XCTAssertEqual(service.hslString(from: blackColor), "hsl(0°, 0%, 0%)")
+    }
+
+    func testDisplayP3StringFormatting() {
+        let service = ColorPickerService.shared
+        let whiteColor = NSColor(srgbRed: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
+        let p3 = service.displayP3String(from: whiteColor)
+        XCTAssertTrue(p3.hasPrefix("color(display-p3"))
+        XCTAssertTrue(p3.contains("1.000"))
+    }
+
     func testRecentColorManagement() {
         let settings = AppSettings.shared
         settings.addRecentColor("#123456")
