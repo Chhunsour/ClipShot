@@ -6,6 +6,12 @@ public final class PathUtils: @unchecked Sendable {
     public static let shared = PathUtils()
 
     /// Returns the active screenshot directory based on system defaults or user preference.
+    ///
+    /// Resolution Order:
+    /// 1. Security-scoped bookmark from user preferences (if configured and valid).
+    /// 2. User-configured custom folder path expanded from tilde.
+    /// 3. macOS system screenshot directory from `com.apple.screencapture location`.
+    /// 4. Fallback to `~/Desktop`.
     public func activeScreenshotFolder() -> URL {
         let settings = AppSettings.shared
 
@@ -33,6 +39,7 @@ public final class PathUtils: @unchecked Sendable {
     }
 
     /// Reads `com.apple.screencapture location` via CFPreferences / UserDefaults.
+    /// Falls back to the current user's `~/Desktop` directory if no preference is configured.
     public func detectSystemScreenshotFolder() -> URL {
         if let location = CFPreferencesCopyAppValue("location" as CFString, "com.apple.screencapture" as CFString) as? String {
             let expanded = (location as NSString).expandingTildeInPath
