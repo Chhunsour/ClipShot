@@ -85,6 +85,8 @@ Customize ClipNotch to fit your setup:
 - **6 Sizing Presets**: Compact, Normal, Large, Extra Large, Ultra Wide, and Studio / Max.
 - **3 Placement Modes**: Top Header (aligned with physical notch), Below Menu Bar, or Free Floating Island.
 
+*(See the complete **[ClipNotch Guide](docs/CLIPNOTCH.md)** for hex palette specs and interactive state descriptions).*
+
 ---
 
 ## 🛠️ Complete Feature Suite
