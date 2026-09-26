@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: ClipShot Documentation Hub
+    url: https://github.com/Chhunsour/ClipShot#%EF%B8%8F-documentation-hub
+    about: Explore detailed guides on ClipNotch, OCR, hotkeys, and troubleshooting.
+  - name: macOS System Permissions Guide
+    url: https://github.com/Chhunsour/ClipShot/blob/main/docs/PERMISSIONS.md
+    about: Instructions for setting up Screen Recording and Files & Folders access.
