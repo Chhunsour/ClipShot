@@ -186,9 +186,10 @@ ClipShot/
 │       │   ├── ScreenRecordingEngine.swift   # AVFoundation screen recording
 │       │   ├── ScrollingCaptureService.swift # Scroll stitch engine
 │       │   └── WindowCaptureService.swift    # Window enumeration & capture
+│       ├── CaptureOverlay/                   # Precision crosshairs, loupe & measurement tools
 │       ├── Core/                             # Kernel & System services
+│       │   ├── ClipboardHistoryManager.swift # Recent clipboard history tracking
 │       │   ├── ClipboardManager.swift        # NSPasteboard multi-type writer
-│       │   ├── DeduplicationCache.swift      # Rapid screenshot burst protection
 │       │   ├── HistoryManager.swift          # History archive & thumbnail cache
 │       │   ├── HotkeyManager.swift           # Carbon global hotkeys
 │       │   ├── LaunchAtLoginManager.swift    # Modern SMAppService integration
@@ -197,7 +198,7 @@ ClipShot/
 │       │   ├── ScreenshotMonitor.swift       # FSEvents filesystem monitor
 │       │   └── ScreenshotProcessor.swift     # Central coordination actor
 │       ├── Features/                         # Feature UI modules
-│       │   ├── Capture/                      # Crosshair magnifier & capture HUD
+│       │   ├── Capture/                      # Capture service orchestration
 │       │   ├── ClipNotch/                    # Dynamic Notch / Island suite
 │       │   │   ├── ClipNotchAppearance.swift # 14 colorways, 6 finishes, motion physics
 │       │   │   ├── ClipNotchPanel.swift      # Non-activating floating notch window
