@@ -282,9 +282,10 @@ Contributions, feature suggestions, and bug reports are welcome! Please check ou
 
 ---
 
-## 📜 License
+## 📜 License & Releases
 
-ClipShot is released under the **[MIT License](LICENSE)**. Feel free to use, modify, and distribute it freely.
+- **Release Notes**: See the **[Changelog](CHANGELOG.md)** for detailed version history and milestone updates.
+- **License**: ClipShot is released under the **[MIT License](LICENSE)**. Feel free to use, modify, and distribute it freely.
 
 <p align="center">
   Crafted with precision for macOS power users.
