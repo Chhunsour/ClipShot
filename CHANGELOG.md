@@ -14,11 +14,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `docs/PERMISSIONS.md`: Detailed setup and troubleshooting for macOS Screen Recording and file permissions.
   - `docs/CLIPNOTCH.md`: Full reference of 14 colorways, 6 finishes, motion physics, and interactive capsules.
   - `docs/KEYBOARD_SHORTCUTS.md`: Keyboard shortcuts reference card and overlay nudge keys.
+  - `docs/SECURITY_AND_ENTITLEMENTS.md`: Local privacy guarantees, TCC permissions, and hardened runtime.
+  - `docs/PERFORMANCE.md`: Benchmarks, memory footprint, and ScreenCaptureKit optimizations.
+  - `docs/OCR_GUIDE.md`: Offline Apple Vision neural text recognition.
+  - `docs/COLOR_PICKER.md`: Precision pixel loupe, HEX / RGB / HSL / Display P3 color formatting.
+  - `docs/MEASUREMENT_TOOL.md`: On-screen Euclidean distance calculation and bounding margins.
+  - `docs/ANNOTATION_STUDIO.md`: Vector arrows, blur & pixelate redactions, step badges, typography.
+  - `docs/FLOATING_PIN.md`: Stay-on-top reference windows with variable transparency.
+  - `docs/HISTORY_ARCHIVE.md`: Searchable capture archive, thumbnail caching, and pruning rules.
+  - `docs/COMMAND_PALETTE.md`: Spotlight-style launcher (`⌥ Space`) and fuzzy search.
+  - `docs/RECORDING_GUIDE.md`: Hardware-accelerated MP4 video and animated GIF capture.
+  - `docs/SCROLLING_CAPTURE.md`: Vertical frame stitching for long documents and code files.
+  - `docs/TROUBLESHOOTING.md`: Diagnostic steps, TCC permission resets, and log inspection.
+  - `docs/CONFIGURATION.md`: Complete `AppSettings` keys, defaults, and `UserDefaults` mapping.
+  - `docs/FAQ.md`: Frequently asked questions, privacy, and performance FAQ.
+  - `docs/ACCESSIBILITY.md`: VoiceOver support, keyboard accessibility, and reduced motion.
+  - `docs/LOCALIZATION.md`: Guide for contributing multi-language translations.
+  - `docs/ROADMAP.md`: Planned features, community requests, and architectural non-goals.
+  - `Examples/README.md`: Developer recipes for extending and integrating with `ClipShotCore`.
   - `Scripts/README.md`: Index and usage instructions for all build and diagnostic automation scripts.
-- GitHub issue templates for bug reports and feature requests.
-- Standard GitHub pull request template.
+- Over 20 comprehensive unit test suites covering models, enums, settings, and utility services.
+- GitHub Actions CI workflow for macOS build, unit test execution, and bundle validation.
+- Dependabot configuration for GitHub Actions dependencies.
+- GitHub issue templates for bug reports, feature requests, and documentation improvements.
+- Standard GitHub pull request template and CODEOWNERS configuration.
 - Enhanced `.gitignore` rules for Xcode workspace, IDE configurations, and dSYM symbols.
 - Target doc comments in `Package.swift`.
+
+### Fixed
+- Fixed unbundled test runner compatibility in `PermissionsManager` to safely guard UserNotifications authorization calls during headless unit tests.
 
 ### Changed
 - Refined README architecture tree to accurately reflect `Core` and `CaptureOverlay` modules.

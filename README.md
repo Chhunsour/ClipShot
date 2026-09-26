@@ -44,6 +44,9 @@ Explore in-depth documentation guides for ClipShot:
 | **[Configuration Reference](docs/CONFIGURATION.md)** | Complete `AppSettings` keys, defaults, and `UserDefaults` mapping. |
 | **[Frequently Asked Questions](docs/FAQ.md)** | Privacy guarantees, battery efficiency, and hardware compatibility. |
 | **[Accessibility (a11y)](docs/ACCESSIBILITY.md)** | VoiceOver support, keyboard accessibility, and reduced motion. |
+| **[Security & Entitlements](docs/SECURITY_AND_ENTITLEMENTS.md)** | Local privacy guarantees, TCC permissions, and hardened runtime. |
+| **[Performance Guide](docs/PERFORMANCE.md)** | Memory footprint, battery conservation, and ScreenCaptureKit streaming. |
+| **[Developer Examples](Examples/README.md)** | Standalone Swift recipes and integration snippets for `ClipShotCore`. |
 | **[Localization](docs/LOCALIZATION.md)** | Guide for contributing multi-language translations. |
 | **[Project Roadmap](docs/ROADMAP.md)** | Planned features, community requests, and architectural non-goals. |
 
