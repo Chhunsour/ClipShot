@@ -167,7 +167,7 @@ flowchart TD
 | `⌥ Space` | **Command Palette** | Quick keyboard launcher for all ClipShot tools |
 | `⌘ V` | **Universal Paste** | Paste the captured image directly into any target app |
 
-*(All hotkeys can be customized or disabled in **Settings → General**).*
+*(All hotkeys can be customized or disabled in **Settings → General**. See the **[Keyboard Shortcuts Guide](docs/KEYBOARD_SHORTCUTS.md)** for precision overlay navigation and nudge keys).*
 
 ---
 
