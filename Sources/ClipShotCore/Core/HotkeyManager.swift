@@ -54,10 +54,16 @@ public final class HotkeyManager: @unchecked Sendable {
 
     // MARK: - Registration
 
+    /// Associates an execution closure with a specific hotkey action trigger.
     public func registerHandler(for action: HotkeyAction, handler: @escaping () -> Void) {
         actionHandlers[action] = handler
     }
 
+    /// Registers a system-wide global hotkey with the macOS Carbon event manager.
+    /// - Parameters:
+    ///   - action: Target action triggered upon key combination activation.
+    ///   - keyCode: Virtual keyboard keycode integer.
+    ///   - modifiers: Carbon modifier mask (cmdKey, controlKey, optionKey, shiftKey).
     public func registerHotKey(action: HotkeyAction, keyCode: UInt32, modifiers: UInt32) {
         // Unregister existing if any
         unregisterHotKey(for: action)
@@ -82,12 +88,14 @@ public final class HotkeyManager: @unchecked Sendable {
         }
     }
 
+    /// Releases the Carbon hotkey reference for a specific action.
     public func unregisterHotKey(for action: HotkeyAction) {
         if let ref = hotKeyRefs.removeValue(forKey: action) {
             UnregisterEventHotKey(ref)
         }
     }
 
+    /// Releases all active Carbon hotkey registrations and cleans up state references.
     public func unregisterAll() {
         for (_, ref) in hotKeyRefs {
             UnregisterEventHotKey(ref)
@@ -97,6 +105,7 @@ public final class HotkeyManager: @unchecked Sendable {
 
     // MARK: - Carbon Handler
 
+    /// Installs a low-level Carbon event handler monitoring `kEventClassKeyboard` / `kEventHotKeyPressed`.
     private func installCarbonEventHandler() {
         var eventType = EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed))
 
