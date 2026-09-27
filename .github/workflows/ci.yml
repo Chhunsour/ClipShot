@@ -25,5 +25,12 @@ jobs:
       - name: Run Test Suite
         run: swift test --parallel
 
+      - name: Validate Developer Examples
+        run: |
+          for script in Examples/*.swift; do
+            echo "Testing $script..."
+            swift "$script" > /dev/null
+          done
+
       - name: Build App Bundle
         run: ./Scripts/build_app.sh
