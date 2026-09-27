@@ -70,6 +70,7 @@ public final class CaptureOverlayController {
         AppLogger.shared.info("Displayed full-screen capture overlay across \(overlayPanels.count) screen(s)")
     }
 
+    /// Dismisses all fullscreen overlay panels across all connected displays and resets overlay state.
     public func dismissOverlay() {
         for panel in overlayPanels {
             panel.orderOut(nil)
@@ -79,6 +80,7 @@ public final class CaptureOverlayController {
 
     // MARK: - Post-Capture Handlers
 
+    /// Routes the cropped screen rectangle to the appropriate subsystem (OCR, video recording, or still capture).
     private func handleRectCapture(_ rect: CGRect) {
         dismissOverlay()
 
