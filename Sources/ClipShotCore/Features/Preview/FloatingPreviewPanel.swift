@@ -66,6 +66,7 @@ public final class FloatingPreviewPanel: NSPanel {
         resetDismissTimer()
     }
 
+    /// Dismisses the floating preview with an alpha fade animation or instantly if reduced motion is requested.
     public func dismiss() {
         dismissTimer?.invalidate()
         dismissTimer = nil
@@ -83,6 +84,7 @@ public final class FloatingPreviewPanel: NSPanel {
         }
     }
 
+    /// Suspends auto-dismiss while mouse cursor hovers over the thumbnail if `pausePreviewOnHover` is enabled.
     private func handleHover(_ hovering: Bool) {
         let pausesOnHover = AppSettings.shared.pausePreviewOnHover
         guard pausesOnHover else {
@@ -98,6 +100,7 @@ public final class FloatingPreviewPanel: NSPanel {
         }
     }
 
+    /// Schedules automatic dismissal timer based on the user's `previewDuration` setting.
     private func resetDismissTimer() {
         dismissTimer?.invalidate()
         let duration = AppSettings.shared.previewDuration
@@ -107,6 +110,7 @@ public final class FloatingPreviewPanel: NSPanel {
         }
     }
 
+    /// Calculates screen corner coordinates relative to the active display's visible bounds.
     private func positionOnScreen() {
         let mouseLocation = NSEvent.mouseLocation
         guard let screen = NSScreen.screens.first(where: { $0.frame.contains(mouseLocation) }) ?? NSScreen.main else { return }
