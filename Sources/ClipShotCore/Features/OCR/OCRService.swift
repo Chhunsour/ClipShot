@@ -8,7 +8,12 @@ public final class OCRService: @unchecked Sendable {
 
     public init() {}
 
-    /// Performs text recognition on a CGImage asynchronously.
+    /// Performs text recognition on a CGImage asynchronously using Apple's Vision framework.
+    ///
+    /// Executes completely offline on device with `.accurate` recognition level and automatic
+    /// language correction. Threading is safely managed via Swift async/await continuations.
+    /// - Parameter cgImage: Source CoreGraphics image to recognize text from.
+    /// - Returns: Recognized text string with lines joined by newline characters.
     public func recognizeText(from cgImage: CGImage) async throws -> String {
         return try await withCheckedThrowingContinuation { continuation in
             let request = VNRecognizeTextRequest { request, error in
@@ -58,7 +63,9 @@ public final class OCRService: @unchecked Sendable {
         return try await recognizeText(from: image)
     }
 
-    /// Detects QR codes and barcodes locally using Vision.
+    /// Detects QR codes and 1D/2D barcodes locally using Apple Vision's `VNDetectBarcodesRequest`.
+    /// - Parameter image: Source NSImage to scan for barcodes.
+    /// - Returns: Array of decoded payload strings found in the image.
     public func detectBarcodes(from image: NSImage) async throws -> [String] {
         guard let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
             return []
