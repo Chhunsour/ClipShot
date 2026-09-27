@@ -76,6 +76,14 @@ Explore in-depth documentation guides for ClipShot:
 | **[Multi-Monitor Setup](docs/MULTI_MONITOR_SETUP.md)** | Mixed-DPI Retina scaling, coordinate mapping, and display hot-plugging. |
 | **[CLI Script Reference](docs/CLI_COMMANDS_REFERENCE.md)** | Complete reference of build scripts, flags, and diagnostic tools. |
 | **[Developer Examples](Examples/README.md)** | Standalone Swift recipes and integration snippets for `ClipShotCore`. |
+| **[macOS Compatibility](docs/MACOS_VERSION_COMPATIBILITY.md)** | Supported macOS releases, Apple Silicon/Intel architectures, and frameworks. |
+| **[Notch Physics & Springs](docs/NOTCH_PHYSICS_AND_SPRINGS.md)** | Spring curves, auto-collapse timing, and +12% idle sizing dynamics. |
+| **[Audio Feedback Guide](docs/AUDIO_FEEDBACK_GUIDE.md)** | Subtle sound effects, system audio triggers, and silent mode compliance. |
+| **[Hotkey Reference](docs/HOTKEY_MAPPING_REFERENCE.md)** | Global Carbon hotkeys, modifiers, and shortcut conflict avoidance. |
+| **[Data Retention & Cache](docs/DATA_RETENTION_AND_CACHE.md)** | Retention policies, disk cache paths, and preserved deleted copies. |
+| **[Local OCR & Privacy](docs/LOCAL_OCR_PRIVACY.md)** | On-device Vision neural processing and zero-egress guarantees. |
+| **[Release Checklist](docs/RELEASE_CHECKLIST.md)** | Verification procedures, CI validation, and notarization checklist. |
+| **[Security Audit Checklist](docs/SECURITY_AUDIT_CHECKLIST.md)** | Repeatable security, sandboxing, and telemetry audit checklist. |
 | **[Localization](docs/LOCALIZATION.md)** | Guide for contributing multi-language translations. |
 | **[Project Roadmap](docs/ROADMAP.md)** | Planned features, community requests, and architectural non-goals. |
 
