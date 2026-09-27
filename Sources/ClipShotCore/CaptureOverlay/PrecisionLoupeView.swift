@@ -3,9 +3,15 @@ import AppKit
 import SwiftUI
 
 /// Magnifying loupe view displaying zoomed pixels, crosshair, color swatch, and coordinates.
+///
+/// Uses nearest-neighbor pixel scaling (`.interpolation(.none)`) to render distinct square pixels
+/// alongside crosshairs and a 1-pixel highlight box for exact color picking and coordinate selection.
 public struct PrecisionLoupeView: View {
+    /// In-memory cropped bitmap around the cursor point scaled up for magnification.
     let magnifiedImage: CGImage?
+    /// Sampled NSColor at the exact center pixel beneath the crosshair.
     let targetColor: NSColor?
+    /// Screen coordinate point currently hovered by the user's cursor.
     let point: CGPoint
 
     public var body: some View {
