@@ -22,6 +22,16 @@ This directory provides standalone executable Swift scripts, reference patterns,
 | [`inspect_display_topology.swift`](inspect_display_topology.swift) | Enumerate connected displays, backing scale, and safe insets | `DisplayTrackingService` |
 | [`test_log_rotation.swift`](test_log_rotation.swift) | Rotating file log simulation and size-based archiving | `AppLogger` |
 | [`convert_image_formats.swift`](convert_image_formats.swift) | Encode bitmaps between PNG, JPEG, and TIFF representations | `ImageUtils` |
+| [`calculate_aspect_ratio.swift`](calculate_aspect_ratio.swift) | Compute display and capture aspect ratios via GCD math | Aspect Ratio & Dimensions |
+| [`simulate_pixel_nudge.swift`](simulate_pixel_nudge.swift) | Demonstrate keyboard arrow micro/macro nudging and edge clamping | Selection Overlay |
+| [`extract_image_dpi.swift`](extract_image_dpi.swift) | Query ImageIO DPI properties and Retina backing scale factors | `ImageIO`, Resolution |
+| [`simulate_clipboard_types.swift`](simulate_clipboard_types.swift) | Inspect NSPasteboard UTI hierarchies and privacy filters | `ClipboardHistoryManager` |
+| [`format_relative_timestamp.swift`](format_relative_timestamp.swift) | Humanized relative time formatting for recent capture shelves | `ScreenshotItem` |
+| [`verify_fsevents_latency.swift`](verify_fsevents_latency.swift) | Measure filesystem change notification and attribute check latency | `ScreenshotMonitor` |
+| [`calculate_color_contrast.swift`](calculate_color_contrast.swift) | Compute WCAG 2.1 relative luminance and contrast ratios | Accessibility & Contrast |
+| [`inspect_window_layers.swift`](inspect_window_layers.swift) | Inspect CoreGraphics window levels used across ClipShot panels | Window Management |
+| [`generate_test_pattern.swift`](generate_test_pattern.swift) | Generate in-memory diagnostic grid test patterns with CoreGraphics | Diagnostics & Rendering |
+| [`parse_hex_color_variants.swift`](parse_hex_color_variants.swift) | Parse and normalize 3-digit, 6-digit, and 8-digit hex colors | `ColorPickerService` |
 
 ---
 
@@ -41,4 +51,14 @@ swift Examples/simulate_notch_transitions.swift
 swift Examples/inspect_display_topology.swift
 swift Examples/test_log_rotation.swift
 swift Examples/convert_image_formats.swift
+swift Examples/calculate_aspect_ratio.swift
+swift Examples/simulate_pixel_nudge.swift
+swift Examples/extract_image_dpi.swift
+swift Examples/simulate_clipboard_types.swift
+swift Examples/format_relative_timestamp.swift
+swift Examples/verify_fsevents_latency.swift
+swift Examples/calculate_color_contrast.swift
+swift Examples/inspect_window_layers.swift
+swift Examples/generate_test_pattern.swift
+swift Examples/parse_hex_color_variants.swift
 ```
