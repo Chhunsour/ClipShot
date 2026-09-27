@@ -2,6 +2,7 @@ import Foundation
 import AppKit
 import SwiftUI
 
+/// Executable action item rendered in the quick command palette.
 public struct PaletteCommand: Identifiable {
     public let id = UUID()
     public let title: String
@@ -10,6 +11,7 @@ public struct PaletteCommand: Identifiable {
     public let action: () -> Void
 }
 
+/// Window controller presenting a spotlight-style command search bar for quick capture triggers.
 public final class CommandPaletteWindowController: NSWindowController {
     public static let shared = CommandPaletteWindowController()
 
@@ -39,6 +41,7 @@ public final class CommandPaletteWindowController: NSWindowController {
         fatalError("init(coder:) has not been implemented")
     }
 
+    /// Toggles the on-screen visibility of the command palette window.
     public func togglePalette() {
         if window?.isVisible == true {
             dismissPalette()
@@ -47,12 +50,14 @@ public final class CommandPaletteWindowController: NSWindowController {
         }
     }
 
+    /// Centers and presents the command palette as key window, bringing ClipShot to front.
     public func showPalette() {
         window?.center()
         window?.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
     }
 
+    /// Hides the command palette window from view.
     public func dismissPalette() {
         window?.orderOut(nil)
     }
