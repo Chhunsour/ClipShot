@@ -350,6 +350,8 @@ public final class AppSettings: ObservableObject {
 
     // MARK: - Init
 
+    /// Initializes user preferences, registering baseline default values and loading persisted overrides.
+    /// - Parameter defaults: Target UserDefaults suite (defaults to `.standard`, accepts mock suites in tests).
     public init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         self.managesSystemPreferences = defaults === UserDefaults.standard
