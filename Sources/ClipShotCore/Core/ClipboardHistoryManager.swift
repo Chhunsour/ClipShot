@@ -50,6 +50,7 @@ public final class ClipboardHistoryManager: ObservableObject {
         self.lastChangeCount = pasteboard.changeCount
     }
 
+    /// Begins periodically polling the system pasteboard changeCount for new content.
     public func startMonitoring() {
         guard timer == nil else { return }
         lastChangeCount = pasteboard.changeCount
@@ -60,11 +61,14 @@ public final class ClipboardHistoryManager: ObservableObject {
         self.timer = timer
     }
 
+    /// Stops polling and releases the background timer.
     public func stopMonitoring() {
         timer?.invalidate()
         timer = nil
     }
 
+    /// Inspects the pasteboard for new content if changeCount has incremented.
+    /// Honors concealed and transient pasteboard flags to protect sensitive user data.
     func checkForChanges() {
         guard pasteboard.changeCount != lastChangeCount else { return }
         lastChangeCount = pasteboard.changeCount
@@ -99,6 +103,7 @@ public final class ClipboardHistoryManager: ObservableObject {
         }
     }
 
+    /// Re-writes a previously captured history item back to the system pasteboard.
     @discardableResult
     public func copy(_ item: ClipboardHistoryItem) -> Bool {
         pasteboard.clearContents()
@@ -117,10 +122,12 @@ public final class ClipboardHistoryManager: ObservableObject {
         return copied
     }
 
+    /// Clears all stored in-memory clipboard history entries.
     public func clearHistory() {
         items.removeAll()
     }
 
+    /// Prepends a new item to history and enforces maximum item capacity.
     private func add(_ item: ClipboardHistoryItem) {
         guard items.first?.fingerprint != item.fingerprint else { return }
         items.insert(item, at: 0)
@@ -129,6 +136,7 @@ public final class ClipboardHistoryManager: ObservableObject {
         }
     }
 
+    /// Extracts PNG or TIFF image representation from the pasteboard within size limits.
     private func imageItemFromPasteboard() -> ClipboardHistoryItem? {
         for type in [NSPasteboard.PasteboardType.png, .tiff] {
             guard let data = pasteboard.data(forType: type), data.count <= maximumImageBytes else { continue }
