@@ -24,12 +24,14 @@ public final class ClipNotchViewModel: ObservableObject {
         refreshRecentItems()
     }
 
+    /// Synchronizes the in-memory recent items shelf with the newest captures from HistoryManager.
     public func refreshRecentItems() {
         self.recentItems = Array(HistoryManager.shared.items.prefix(5))
     }
 
     // MARK: - State Transitions
 
+    /// Resets ClipNotch to idle presentation or restores an active video stream if running.
     public func showIdle() {
         cancelDismissTimer()
         if let video = activeVideoModel, VideoCapsuleStreamService.shared.isStreaming {
@@ -39,11 +41,13 @@ public final class ClipNotchViewModel: ObservableObject {
         }
     }
 
+    /// Expands ClipNotch into quick action launcher mode displaying tool shortcuts.
     public func showQuickActions() {
         cancelDismissTimer()
         self.currentState = .quickActions
     }
 
+    /// Transitions ClipNotch into screenshot preview presentation or nests preview over active video.
     public func showScreenshot(item: ScreenshotItem, image: NSImage) {
         cancelDismissTimer()
         refreshRecentItems()
