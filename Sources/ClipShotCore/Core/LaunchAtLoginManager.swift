@@ -12,11 +12,14 @@ public final class LaunchAtLoginManager: ObservableObject {
         refreshStatus()
     }
 
+    /// Queries the current SMAppService registration status for the main application bundle.
     public func refreshStatus() {
         let status = SMAppService.mainApp.status
         self.isEnabled = (status == .enabled)
     }
 
+    /// Registers or unregisters the app from macOS Login Items via SMAppService.
+    /// - Parameter enable: True to launch automatically when the user logs in, false to disable.
     public func setEnabled(_ enable: Bool) {
         do {
             if enable {
@@ -36,6 +39,7 @@ public final class LaunchAtLoginManager: ObservableObject {
         refreshStatus()
     }
 
+    /// Toggles the current Launch at Login state.
     public func toggle() {
         setEnabled(!isEnabled)
     }
