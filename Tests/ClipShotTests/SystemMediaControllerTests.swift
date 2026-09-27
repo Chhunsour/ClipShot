@@ -28,4 +28,20 @@ final class SystemMediaControllerTests: XCTestCase {
         XCTAssertNil(SystemMediaController.scriptablePlayer(for: "com.google.Chrome"))
         XCTAssertNil(SystemMediaController.scriptablePlayer(for: nil))
     }
+
+    func testSystemMediaPlaybackOptionsUnavailable() {
+        let unavailable = SystemMediaPlaybackOptions.unavailable
+        XCTAssertFalse(unavailable.shuffle)
+        XCTAssertFalse(unavailable.repeatEnabled)
+        XCTAssertFalse(unavailable.favorite)
+        XCTAssertFalse(unavailable.shuffleAvailable)
+        XCTAssertFalse(unavailable.repeatAvailable)
+        XCTAssertFalse(unavailable.favoriteAvailable)
+    }
+
+    func testSystemMediaCommandRawValues() {
+        XCTAssertEqual(SystemMediaCommand.playPause.rawValue, 16)
+        XCTAssertEqual(SystemMediaCommand.next.rawValue, 17)
+        XCTAssertEqual(SystemMediaCommand.previous.rawValue, 18)
+    }
 }
