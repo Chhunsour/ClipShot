@@ -85,6 +85,12 @@ Explore in-depth documentation guides for ClipShot:
 | **[Release Checklist](docs/RELEASE_CHECKLIST.md)** | Verification procedures, CI validation, and notarization checklist. |
 | **[Security Audit Checklist](docs/SECURITY_AUDIT_CHECKLIST.md)** | Repeatable security, sandboxing, and telemetry audit checklist. |
 | **[Localization](docs/LOCALIZATION.md)** | Guide for contributing multi-language translations. |
+| **[Multilingual & RTL Workflows](docs/MULTILINGUAL_LOCALIZATION_WORKFLOW.md)** | String catalogs, Right-to-Left layout mirroring, and pluralization. |
+| **[Window Capture & Hierarchy](docs/WINDOW_CAPTURE_DETECTION.md)** | Window border sniffing, shadow trimming, and CGWindowID extraction. |
+| **[OLED Burn-In Mitigation](docs/OLED_BURNIN_PROTECTION.md)** | Periodic micro-pixel displacement and auto-collapse for OLED displays. |
+| **[Dark Mode & Contrast](docs/DARK_MODE_AND_CONTRAST.md)** | System appearance sync, vibrancy materials, and high-contrast WCAG rules. |
+| **[Terminal Path Security](docs/TERMINAL_PATH_PASTING_SECURITY.md)** | POSIX single-quote path escaping and shell injection prevention. |
+| **[Memory & Buffer Management](docs/MEMORY_MANAGEMENT_AND_AUTORELEASE.md)** | Autorelease pool scoping, ImageIO lazy reads, and ScreenCaptureKit frame limits. |
 | **[Project Roadmap](docs/ROADMAP.md)** | Planned features, community requests, and architectural non-goals. |
 
 ---
