@@ -63,6 +63,8 @@ public final class ScreenshotMonitor: @unchecked Sendable {
 
     // MARK: - Private FSEvents Setup
 
+    /// Configures and starts the low-latency FSEventStream on a background dispatch queue.
+    /// Uses kFSEventStreamCreateFlagFileEvents for file-level granular notifications.
     private func startFSEventStream(for path: String) {
         var context = FSEventStreamContext(
             version: 0,
@@ -103,6 +105,7 @@ public final class ScreenshotMonitor: @unchecked Sendable {
         FSEventStreamStart(stream)
     }
 
+    /// Processes batch filesystem events and dispatches created/renamed file URLs to ScreenshotProcessor.
     private func handleEvents(paths: UnsafeMutableRawPointer, flags: UnsafePointer<FSEventStreamEventFlags>, count: Int) {
         guard let pathArray = unsafeBitCast(paths, to: NSArray.self) as? [String] else { return }
 
@@ -127,6 +130,7 @@ public final class ScreenshotMonitor: @unchecked Sendable {
         }
     }
 
+    /// Registers for system wake notifications to re-establish the FSEvents stream after sleep.
     private func setupWakeNotification() {
         NSWorkspace.shared.notificationCenter.addObserver(
             forName: NSWorkspace.didWakeNotification,
