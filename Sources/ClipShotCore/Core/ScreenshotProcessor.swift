@@ -190,6 +190,7 @@ public actor ScreenshotProcessor {
         return ImageUtils.isValidImage(at: url)
     }
 
+    /// Generates a collision-resistant deduplication key combining the filesystem inode and modification timestamp.
     private func makeEventKey(for url: URL) -> String {
         if let attrs = try? FileManager.default.attributesOfItem(atPath: url.path),
            let fileNumber = attrs[.systemFileNumber] as? UInt,
@@ -199,6 +200,7 @@ public actor ScreenshotProcessor {
         return url.path
     }
 
+    /// Evicts stale deduplication cache entries older than the sliding event cache window.
     private func cleanExpiredEvents(now: TimeInterval) {
         let cutoff = now - 1.5 // 1.5 second cache window for rapid bursts
         processedEvents = processedEvents.filter { $0.value >= cutoff }
