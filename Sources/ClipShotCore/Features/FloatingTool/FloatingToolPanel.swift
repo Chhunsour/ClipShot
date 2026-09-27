@@ -25,6 +25,7 @@ public final class FloatingToolPanel: NSPanel {
         self.contentViewController = NSHostingController(rootView: contentView)
     }
 
+    /// Toggles on-screen presentation of the floating dock based on the user's active `floatingToolStyle` preference.
     public func updateVisibility() {
         let style = AppSettings.shared.floatingToolStyle
         if style == .hidden {
@@ -35,6 +36,7 @@ public final class FloatingToolPanel: NSPanel {
     }
 }
 
+/// Interactive SwiftUI view rendered inside `FloatingToolPanel` supporting collapsed and expanded states.
 public struct FloatingToolView: View {
     @ObservedObject private var settings = AppSettings.shared
     @State private var isExpanded: Bool = false
