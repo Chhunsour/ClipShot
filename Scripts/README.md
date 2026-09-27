@@ -47,3 +47,7 @@ With ClipShot running:
 ```bash
 swift Scripts/check_notch_hover_stability.swift
 ```
+
+### 5. Developer Examples & Standalone Recipes
+For standalone integration recipes and subsystem prototypes, refer to the [Developer Examples](../Examples/README.md) directory containing 24 runnable Swift scripts.
+
