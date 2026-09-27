@@ -56,6 +56,7 @@ public final class PathUtils: @unchecked Sendable {
     }
 
     /// Creates and saves a security-scoped bookmark for a selected folder URL.
+    /// - Parameter folderURL: File system directory URL chosen by the user in NSOpenPanel.
     public func saveBookmark(for folderURL: URL) {
         do {
             let bookmark = try folderURL.bookmarkData(
@@ -73,6 +74,8 @@ public final class PathUtils: @unchecked Sendable {
     }
 
     /// Tests whether the application can read from the given folder.
+    /// - Parameter url: Target directory URL to inspect.
+    /// - Returns: True if path exists, is a directory, and is readable by the app process.
     public func canReadFolder(at url: URL) -> Bool {
         var isDir: ObjCBool = false
         guard FileManager.default.fileExists(atPath: url.path, isDirectory: &isDir), isDir.boolValue else {
@@ -81,7 +84,9 @@ public final class PathUtils: @unchecked Sendable {
         return FileManager.default.isReadableFile(atPath: url.path)
     }
 
-    /// Returns a user-friendly display path (e.g. replacing $HOME with ~).
+    /// Returns a user-friendly display path replacing the user's home directory prefix with `~`.
+    /// - Parameter url: Target file system URL.
+    /// - Returns: Compact path string formatted for UI presentation.
     public func displayPath(for url: URL) -> String {
         let home = NSHomeDirectory()
         let path = url.path
