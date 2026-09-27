@@ -7,6 +7,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.0] - 2026-09-27
+
+### Added
+- **22 Unit Test Suites** across core models, services, and format converters:
+  - `SystemNowPlayingServiceTests`: Display title and full snapshot decoding.
+  - `SystemMediaControllerTests`: SystemMediaPlaybackOptions and command raw values.
+  - `ClipNotchPlacementModeTests`: PlacementMode and IdleContent Codable roundtrip.
+  - `ClipNotchStateMachineTests`: Video activity and model inspection.
+  - `RecentCaptureShelfModelTests`: Shelf state and non-deleted item filtering.
+  - `OCRResultWindowModelTests`: Word count and Unicode character calculation.
+  - `MeasurementSnappingTests`: Distance to self, negative bounds, and axis snapping.
+  - `PrecisionLoupeModelTests`: Readout formatting and offset positioning.
+  - `AppSettingsDefaultsExtendedTests`: Registered defaults and persistence.
+  - `AppSettingsValidationTests`: Color palette capping and rect serialization.
+  - `AppLoggerRotationTests`: ISO8601 formatting and rotation filenames.
+  - `PathUtilsBookmarkTests`: Root display path and directory verification.
+  - `ImageUtilsScalingTests`: Aspect-fit and aspect-fill scaling math.
+  - `ImageUtilsCompressionTests`: PNG magic bytes and TIFF generation.
+  - `HistoryFilterTests`: Query filtering by filename and dimensions.
+  - `HistoryGroupingTests`: Date section grouping and preserved copy fallback.
+  - `MarkupElementSerializationTests`: Markup tool parsing and step sequencing.
+  - `ColorFormatConversionExtendedTests`: Hex, RGB, HSL, and P3 conversions.
+  - `VideoCapsuleStreamModelTests`: FPS bounds and aspect ratio consistency.
+  - `DisplayTrackingGeometryTests`: Multi-display bounding union and Retina strings.
+  - `ScreenshotNamingTests`: Nordic, East Asian, and Xcode Simulator naming regex.
+  - `ClipboardFormatTests`: POSIX shell escaping and file-only pasteboard mode.
+- **10 Developer Example Scripts** in `Examples/`:
+  - `extract_artwork_colors.swift`: Color quantization and frequency histograms.
+  - `measure_euclidean_distance.swift`: Pixel distance and axis snapping.
+  - `query_screencapture_defaults.swift`: macOS system screencapture defaults inspection.
+  - `parse_smart_data_ocr.swift`: NSDataDetector smart entity extraction.
+  - `generate_color_swatches.swift`: ANSI truecolor terminal swatches.
+  - `format_byte_sizes.swift`: ByteCountFormatter file and memory styles.
+  - `simulate_notch_transitions.swift`: Notch state machine transition simulation.
+  - `inspect_display_topology.swift`: Screen resolution and notch margin inspector.
+  - `test_log_rotation.swift`: Size-based rotating file log simulation.
+  - `convert_image_formats.swift`: Bitmap transcoding between PNG, JPEG, and TIFF.
+- **8 Architectural Documentation Guides**:
+  - `docs/MACOS_VERSION_COMPATIBILITY.md`: macOS release and architecture matrix.
+  - `docs/NOTCH_PHYSICS_AND_SPRINGS.md`: Spring curves, auto-collapse, and idle sizing.
+  - `docs/AUDIO_FEEDBACK_GUIDE.md`: Feedback sounds, system triggers, and silence compliance.
+  - `docs/HOTKEY_MAPPING_REFERENCE.md`: Global Carbon hotkeys and shortcut reference.
+  - `docs/DATA_RETENTION_AND_CACHE.md`: Retention policies and local cache directories.
+  - `docs/LOCAL_OCR_PRIVACY.md`: Apple Neural Engine OCR privacy guarantees.
+  - `docs/RELEASE_CHECKLIST.md`: Pre-release verification and notarization checklist.
+  - `docs/SECURITY_AUDIT_CHECKLIST.md`: Telemetry, sandboxing, and permission audit guide.
+- **Documentation & CI Improvements**:
+  - Complete index of all 14 standalone scripts in `Examples/README.md`.
+  - Added automated example syntax validation step in `.github/workflows/ci.yml`.
+  - Indexed all architectural guides in `README.md` Documentation Hub.
+  - Added detailed doc comments (`///`) to 10 core service classes.
+
+---
+
 ## [1.3.0] - 2026-09-26
 
 ### Added
