@@ -156,6 +156,7 @@ public final class HistoryManager: ObservableObject, @unchecked Sendable {
 
     // MARK: - Persistence & Pruning
 
+    /// Deserializes previously persisted screenshot items from the local JSON file.
     private func loadHistory() {
         guard fileManager.fileExists(atPath: historyFileURL.path),
               let data = try? Data(contentsOf: historyFileURL),
@@ -168,6 +169,7 @@ public final class HistoryManager: ObservableObject, @unchecked Sendable {
         }
     }
 
+    /// Asynchronously serializes the in-memory items array to disk using atomic file writing.
     private func saveHistoryAsync() {
         let itemsToSave = self.items
         queue.async { [weak self] in
@@ -178,6 +180,7 @@ public final class HistoryManager: ObservableObject, @unchecked Sendable {
         }
     }
 
+    /// Verifies physical presence of screenshot files on disk and flags missing entries.
     private func validateDiskExistence() {
         for i in 0..<items.count {
             let exists = fileManager.fileExists(atPath: items[i].fileURL.path)
