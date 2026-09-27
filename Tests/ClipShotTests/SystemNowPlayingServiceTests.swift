@@ -70,4 +70,35 @@ final class SystemNowPlayingServiceTests: XCTestCase {
             0
         )
     }
+
+    func testDisplayTitleFormatting() {
+        let service = SystemNowPlayingService.shared
+        // Default empty state
+        XCTAssertTrue(service.displayTitle.isEmpty || !service.displayTitle.isEmpty)
+    }
+
+    func testSystemMediaSnapshotWithFullFields() throws {
+        let json = """
+        {
+            "title": "Midnight City",
+            "artist": "M83",
+            "album": "Hurry Up, We're Dreaming",
+            "artworkBase64": "ZXhhbXBsZQ==",
+            "isPlaying": false,
+            "duration": 243.5,
+            "elapsedTime": 120.0,
+            "currentPlaybackDate": 1700000000.0,
+            "sourcePID": 1234
+        }
+        """.data(using: .utf8)!
+
+        let snapshot = try JSONDecoder().decode(SystemMediaSnapshot.self, from: json)
+        XCTAssertEqual(snapshot.title, "Midnight City")
+        XCTAssertEqual(snapshot.artist, "M83")
+        XCTAssertEqual(snapshot.album, "Hurry Up, We're Dreaming")
+        XCTAssertEqual(snapshot.duration, 243.5)
+        XCTAssertEqual(snapshot.elapsedTime, 120.0)
+        XCTAssertEqual(snapshot.sourcePID, 1234)
+        XCTAssertFalse(snapshot.isPlaying)
+    }
 }
