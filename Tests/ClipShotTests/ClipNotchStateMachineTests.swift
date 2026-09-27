@@ -171,4 +171,27 @@ final class ClipNotchStateMachineTests: XCTestCase {
         try await Task.sleep(nanoseconds: 200_000_000)
         XCTAssertEqual(vm.currentState, .musicPlayer)
     }
+
+    func testIsVideoActiveAndActiveVideoModel() {
+        let videoModel = VideoCapsuleModel(windowID: 10, appName: "QuickTime", windowTitle: "Sample")
+        let videoState = ClipNotchState.video(model: videoModel)
+        XCTAssertTrue(videoState.isVideoActive)
+        XCTAssertEqual(videoState.activeVideoModel?.appName, "QuickTime")
+
+        let interruptedState = ClipNotchState.videoInterruptedByScreenshot(
+            video: videoModel,
+            screenshot: ScreenshotItem(fileURL: URL(fileURLWithPath: "/tmp/s.png")),
+            image: NSImage()
+        )
+        XCTAssertTrue(interruptedState.isVideoActive)
+        XCTAssertEqual(interruptedState.activeVideoModel?.appName, "QuickTime")
+
+        let idleState = ClipNotchState.idle
+        XCTAssertFalse(idleState.isVideoActive)
+        XCTAssertNil(idleState.activeVideoModel)
+
+        let recordingState = ClipNotchState.recording(durationSeconds: 15, isPaused: false)
+        XCTAssertFalse(recordingState.isVideoActive)
+        XCTAssertNil(recordingState.activeVideoModel)
+    }
 }
