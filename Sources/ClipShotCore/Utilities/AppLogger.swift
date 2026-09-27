@@ -39,6 +39,10 @@ public final class AppLogger: @unchecked Sendable {
         fileHandle?.seekToEndOfFile()
     }
 
+    /// Appends a timestamped log line to the diagnostic log file on a serial utility queue.
+    /// - Parameters:
+    ///   - message: Diagnostic event message string.
+    ///   - level: Log level identifier (INFO, WARN, ERROR, DEBUG).
     public func log(_ message: String, level: String = "INFO") {
         let timestamp = ISO8601DateFormatter().string(from: Date())
         let line = "[\(timestamp)] [\(level)] \(message)\n"
@@ -56,18 +60,22 @@ public final class AppLogger: @unchecked Sendable {
         }
     }
 
+    /// Logs an informational diagnostic event.
     public func info(_ message: String) {
         log(message, level: "INFO")
     }
 
+    /// Logs a non-fatal warning condition.
     public func warning(_ message: String) {
         log(message, level: "WARN")
     }
 
+    /// Logs a subsystem or I/O failure.
     public func error(_ message: String) {
         log(message, level: "ERROR")
     }
 
+    /// Logs verbose debugging information in DEBUG compilation builds only.
     public func debug(_ message: String) {
         #if DEBUG
         log(message, level: "DEBUG")
