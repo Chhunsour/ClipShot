@@ -41,6 +41,7 @@ public final class ColorPickerService: @unchecked Sendable {
 
     // MARK: - Color Formatters
 
+    /// Formats an NSColor into an uppercase 6-character hexadecimal string in sRGB color space.
     public func hexString(from color: NSColor) -> String {
         guard let rgb = color.usingColorSpace(.sRGB) else { return "#000000" }
         let r = Int(round(rgb.redComponent * 255))
@@ -49,6 +50,7 @@ public final class ColorPickerService: @unchecked Sendable {
         return String(format: "#%02X%02X%02X", r, g, b)
     }
 
+    /// Formats an NSColor into a CSS-compliant `rgb(r, g, b)` string in sRGB space.
     public func rgbString(from color: NSColor) -> String {
         guard let rgb = color.usingColorSpace(.sRGB) else { return "rgb(0, 0, 0)" }
         let r = Int(round(rgb.redComponent * 255))
@@ -57,6 +59,7 @@ public final class ColorPickerService: @unchecked Sendable {
         return "rgb(\(r), \(g), \(b))"
     }
 
+    /// Formats an NSColor into a CSS `hsl(h°, s%, l%)` representation.
     public func hslString(from color: NSColor) -> String {
         guard let rgb = color.usingColorSpace(.sRGB) else { return "hsl(0°, 0%, 0%)" }
         let h = Int(round(rgb.hueComponent * 360))
@@ -65,6 +68,7 @@ public final class ColorPickerService: @unchecked Sendable {
         return "hsl(\(h)°, \(s)%, \(l)%)"
     }
 
+    /// Formats an NSColor into wide-gamut Display P3 CSS syntax `color(display-p3 r g b)`.
     public func displayP3String(from color: NSColor) -> String {
         guard let p3 = color.usingColorSpace(.displayP3) else { return "color(display-p3 0 0 0)" }
         let r = String(format: "%.3f", p3.redComponent)
