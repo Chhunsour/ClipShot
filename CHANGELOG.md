@@ -5,6 +5,48 @@ All notable changes to **ClipShot** will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-09-28
+
+### Added
+- **15 Unit Test Suites** across core subsystems and models:
+  - `CaptureModeTests`: CaptureMode rawValues, titles, icons, and Codable roundtrip.
+  - `FloatingToolStyleTests`: FloatingToolStyle display names and WindowInfo title formatting.
+  - `RecordingFormatTests`: Screen recording format options, FPS bounds, and microphone toggles.
+  - `ClipboardHistoryDeduplicationTests`: 12-item capacity limit, length capping, and whitespace filtering.
+  - `ArtworkPaletteQuantizationTests`: Triad expansion, alpha thresholding, and luminance clamping.
+  - `VideoCapsuleAspectCalculationTests`: Aspect fit/fill math and widescreen dimensions.
+  - `ScreenshotMetadataSanitizationTests`: Dimension formatting, display paths, and Codable roundtrip.
+  - `RecentCaptureShelfCapacityTests`: Case-insensitive color deduplication and shelf limits.
+  - `HistoryRetentionPruningTests`: Cutoff date calculation and expired item filtering.
+  - `ScreenGeometryNudgeTests`: 1px/10px keyboard arrow nudges and boundary clamping.
+  - `ColorFormatHSLMathTests`: Primary HSL conversions, Display P3 gamut strings, and hex equivalence.
+  - `LogRotationThresholdTests`: File size constants, naming sequence, and stability delays.
+  - `DisplaySafeAreaInsetsTests`: Notch origin placement and menu bar inset math.
+  - `ClipboardTextDetectionTests`: Multi-line text flattening, whitespace filtering, and tooltip truncation.
+  - `ImageUtilsResolutionTests`: Retina point-to-pixel math, case-insensitive extensions, and PNG headers.
+- **10 Developer Example Scripts** in `Examples/`:
+  - `calculate_aspect_ratio.swift`: GCD aspect ratio calculations for displays and captures.
+  - `simulate_pixel_nudge.swift`: Keyboard arrow micro/macro nudging simulation.
+  - `extract_image_dpi.swift`: ImageIO DPI query and backing scale factors.
+  - `simulate_clipboard_types.swift`: NSPasteboard UTI hierarchies and privacy filters.
+  - `format_relative_timestamp.swift`: Humanized relative time formatting.
+  - `verify_fsevents_latency.swift`: FSEvents file latency benchmark.
+  - `calculate_color_contrast.swift`: WCAG 2.1 relative luminance and contrast calculator.
+  - `inspect_window_layers.swift`: CoreGraphics window levels hierarchy inspector.
+  - `generate_test_pattern.swift`: In-memory CoreGraphics diagnostic grid generator.
+  - `parse_hex_color_variants.swift`: Multi-format 3, 6, and 8-digit hex parser.
+- **6 Architectural & Security Guides**:
+  - `docs/WINDOW_CAPTURE_DETECTION.md`: Window border sniffing and shadow trimming.
+  - `docs/OLED_BURNIN_PROTECTION.md`: Micro-pixel displacement for OLED longevity.
+  - `docs/MULTILINGUAL_LOCALIZATION_WORKFLOW.md`: String catalogs and RTL layout mirroring.
+  - `docs/DARK_MODE_AND_CONTRAST.md`: System appearance sync and high-contrast compliance.
+  - `docs/TERMINAL_PATH_PASTING_SECURITY.md`: POSIX shell single-quote escaping and injection prevention.
+  - `docs/MEMORY_MANAGEMENT_AND_AUTORELEASE.md`: Autorelease pool scoping and buffer limits.
+- **Documentation & Index Updates**:
+  - Indexed all 24 standalone developer scripts in `Examples/README.md`.
+  - Indexed all new guides in `README.md` Documentation Hub.
+  - Expanded doc comments (`///`) across 10 core subsystem classes.
+
 ---
 
 ## [1.4.0] - 2026-09-27
