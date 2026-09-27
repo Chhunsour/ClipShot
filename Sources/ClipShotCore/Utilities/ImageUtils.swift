@@ -20,6 +20,8 @@ public enum ImageUtils {
     }
 
     /// Extracts pixel dimensions and file size using ImageIO without decoding full bitmap into RAM.
+    /// - Parameter url: File URL of the candidate image.
+    /// - Returns: Tuple of width in pixels, height in pixels, and file size in bytes, or nil if unreadable.
     public static func getImageMetadata(at url: URL) -> (width: Int, height: Int, fileSize: Int64)? {
         guard let source = CGImageSourceCreateWithURL(url as CFURL, nil) else { return nil }
         guard let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any] else { return nil }
@@ -37,6 +39,8 @@ public enum ImageUtils {
     }
 
     /// Checks whether an image at a URL is valid and readable by ImageIO.
+    /// - Parameter url: File URL to test.
+    /// - Returns: True if file exists and ImageIO reports statusComplete with at least 1 image frame.
     public static func isValidImage(at url: URL) -> Bool {
         guard let source = CGImageSourceCreateWithURL(url as CFURL, nil) else { return false }
         let count = CGImageSourceGetCount(source)
