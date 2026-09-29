@@ -4,11 +4,29 @@ import AVFoundation
 import CoreGraphics
 
 /// Screen recording engine supporting Area, Window, and Full Screen capture to MP4/MOV and animated GIF.
+///
+/// ## Architecture & Video Pipeline
+/// Operates two distinct encoding backends:
+/// 1. **Hardware-Accelerated Video (MP4/H.264)**:
+///    - Utilizes `AVAssetWriter`, `AVAssetWriterInput`, and `AVAssetWriterInputPixelBufferAdaptor`.
+///    - Streams sampled `CVPixelBuffer` frames with microsecond presentation timestamps (`CMTime`).
+/// 2. **Animated GIF Engine**:
+///    - Captures sequenced `CGImage` keyframes into memory.
+///    - Finalizes using `CGImageDestination` with customizable frame delays and looping properties.
+///
+/// Coordinates with `ClipNotchViewModel` to display live recording duration, audio indicators,
+/// and pause/resume states directly inside the MacBook notch overlay.
 public final class ScreenRecordingEngine: NSObject, ObservableObject, @unchecked Sendable {
+    /// Shared singleton recording engine instance.
     public static let shared = ScreenRecordingEngine()
 
+    /// Published flag reflecting whether an active video or GIF capture session is in progress.
     @Published public var isRecording: Bool = false
+
+    /// Published flag reflecting whether the active session is temporarily paused.
     @Published public var isPaused: Bool = false
+
+    /// Elapsed recording duration in whole seconds.
     @Published public var durationSeconds: Int = 0
 
     private var timer: Timer?
@@ -29,7 +47,11 @@ public final class ScreenRecordingEngine: NSObject, ObservableObject, @unchecked
         super.init()
     }
 
-    /// Starts recording the specified region.
+    /// Starts recording the specified screen rect as an MP4 video or animated GIF.
+    ///
+    /// - Parameters:
+    ///   - rect: Screen coordinates defining the recording area.
+    ///   - asGIF: `true` to record an animated GIF sequence; `false` for standard H.264 MP4.
     public func startRecording(rect: CGRect, asGIF: Bool = false) {
         stopRecording(save: false)
 
