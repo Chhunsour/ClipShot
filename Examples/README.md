@@ -32,33 +32,39 @@ This directory provides standalone executable Swift scripts, reference patterns,
 | [`inspect_window_layers.swift`](inspect_window_layers.swift) | Inspect CoreGraphics window levels used across ClipShot panels | Window Management |
 | [`generate_test_pattern.swift`](generate_test_pattern.swift) | Generate in-memory diagnostic grid test patterns with CoreGraphics | Diagnostics & Rendering |
 | [`parse_hex_color_variants.swift`](parse_hex_color_variants.swift) | Parse and normalize 3-digit, 6-digit, and 8-digit hex colors | `ColorPickerService` |
+| [`detect_localized_screenshots.swift`](detect_localized_screenshots.swift) | Multi-language regex matching across 11 macOS localization patterns | `ScreenshotDetector` |
+| [`calculate_memory_budget.swift`](calculate_memory_budget.swift) | Uncompressed raster memory budget calculator across Retina/Pro displays | Memory & Buffers |
+| [`simulate_spring_physics.swift`](simulate_spring_physics.swift) | Harmonic oscillator spring physics and critically damped settling simulator | `ClipNotchPanel` Motion |
+| [`inspect_display_gamut.swift`](inspect_display_gamut.swift) | Display P3 vs sRGB color primaries, chromaticity, and volume | Color Fidelity |
+| [`benchmark_regex_matching.swift`](benchmark_regex_matching.swift) | Benchmark precompiled vs on-the-fly regex matching speedup | Performance & FSEvents |
+| [`simulate_key_debounce.swift`](simulate_key_debounce.swift) | Event burst debouncing and sliding cache duplicate suppression | `ScreenshotProcessor` |
+| [`format_duration_string.swift`](format_duration_string.swift) | Screen recording duration formatting and boundary validation | `ScreenRecordingEngine` |
+| [`calculate_pixel_density.swift`](calculate_pixel_density.swift) | Mac display PPI, physical diagonal, and Retina scale factors | Retina Coordinate Math |
+| [`inspect_pasteboard_flavors.swift`](inspect_pasteboard_flavors.swift) | Multi-flavor NSPasteboard item inspection and consumer extraction | `ClipboardManager` |
+| [`simulate_color_quantization.swift`](simulate_color_quantization.swift) | Uniform box color quantization and dominant centroid extraction | Palette Extraction |
 
 ---
 
 ## Executing Examples
 
-All scripts in this directory are self-contained executable Swift scripts. Run them from the command line:
+All scripts in this directory are self-contained executable Swift scripts using `#!/usr/bin/env swift`. Run them from the repository root:
 
 ```bash
-swift Examples/detect_screenshot_folder.swift
-swift Examples/extract_artwork_colors.swift
-swift Examples/measure_euclidean_distance.swift
-swift Examples/query_screencapture_defaults.swift
-swift Examples/parse_smart_data_ocr.swift
-swift Examples/generate_color_swatches.swift
-swift Examples/format_byte_sizes.swift
-swift Examples/simulate_notch_transitions.swift
-swift Examples/inspect_display_topology.swift
-swift Examples/test_log_rotation.swift
-swift Examples/convert_image_formats.swift
-swift Examples/calculate_aspect_ratio.swift
-swift Examples/simulate_pixel_nudge.swift
-swift Examples/extract_image_dpi.swift
-swift Examples/simulate_clipboard_types.swift
-swift Examples/format_relative_timestamp.swift
-swift Examples/verify_fsevents_latency.swift
-swift Examples/calculate_color_contrast.swift
-swift Examples/inspect_window_layers.swift
-swift Examples/generate_test_pattern.swift
-swift Examples/parse_hex_color_variants.swift
+swift Examples/detect_localized_screenshots.swift
+swift Examples/calculate_memory_budget.swift
+swift Examples/simulate_spring_physics.swift
+swift Examples/inspect_display_gamut.swift
+swift Examples/benchmark_regex_matching.swift
+swift Examples/simulate_key_debounce.swift
+swift Examples/format_duration_string.swift
+swift Examples/calculate_pixel_density.swift
+swift Examples/inspect_pasteboard_flavors.swift
+swift Examples/simulate_color_quantization.swift
+```
+
+To validate all 34 examples in sequence:
+```bash
+for script in Examples/*.swift; do
+    swift "$script" > /dev/null || exit 1
+done
 ```
