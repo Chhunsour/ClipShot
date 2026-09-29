@@ -3,25 +3,52 @@ import AppKit
 
 /// Central actor coordinating screenshot ingestion, deduplication, file stability verification,
 /// sequence-ordered clipboard updates, history recording, and post-copy file management.
+///
+/// ## Actor Isolation & Concurrency
+/// As a Swift actor, `ScreenshotProcessor` serializes access to mutable state (`sequenceCounter`,
+/// `latestClipboardSequence`, `processedEvents`), guaranteeing zero data races when concurrent
+/// filesystem events fire simultaneously across multi-monitor or rapid-capture scenarios.
+///
+/// ## 8-Step Processing Pipeline
+/// 1. **Deduplication Check**: Queries sliding cache to eliminate redundant events within milliseconds.
+/// 2. **File Write Stability**: Probes file size across 5ms micro-waits until macOS flush completes.
+/// 3. **Validation**: Passes candidate through `ScreenshotDetector` rules.
+/// 4. **Decoding**: Loads bitmap rep and metadata on background cooperative thread pool.
+/// 5. **Sequence-Guarded Clipboard**: Enforces strictly monotonic sequence order so older captures
+///    never overwrite newer captures.
+/// 6. **Post-Copy Actions**: Trashes original file or schedules delayed auto-deletion if requested.
+/// 7. **History Journaling**: Persists snapshot to local SQLite/disk history.
+/// 8. **UI Presentation**: Signals ClipNotch or floating preview window on `@MainActor`.
 public actor ScreenshotProcessor {
+    /// Shared singleton actor instance.
     public static let shared = ScreenshotProcessor()
 
+    /// Monotonically increasing sequence ID assigned to each validated screenshot.
     private var sequenceCounter: UInt64 = 0
+
+    /// Highest sequence ID that has been successfully written to the system pasteboard.
     private var latestClipboardSequence: UInt64 = 0
 
-    // Inode / Path + modification timestamp cache to avoid duplicate processing
+    /// Inode / Path + modification timestamp cache to avoid duplicate processing of burst events.
     private var processedEvents: [String: TimeInterval] = [:]
 
-    // Callback to trigger floating preview on MainActor
+    /// Optional callback to trigger floating preview presentation on MainActor.
     private var previewCallback: (@MainActor (URL, NSImage, ScreenshotItem) -> Void)?
 
+    /// Default initializer.
     public init() {}
 
+    /// Registers a closure to be executed on the MainActor when a screenshot is ready for display.
+    /// - Parameter callback: Closure receiving file URL, decoded NSImage, and ScreenshotItem model.
     public func setPreviewCallback(_ callback: @escaping @MainActor (URL, NSImage, ScreenshotItem) -> Void) {
         self.previewCallback = callback
     }
 
     /// Main entry point: processes a detected file candidate URL from the filesystem monitor.
+    ///
+    /// Executes the full 8-step pipeline with deduplication, stability verification, and UI dispatch.
+    ///
+    /// - Parameter url: Filesystem URL of the newly created or modified file.
     public func processCandidate(url: URL) async {
         let settings = AppSettings.shared
         guard settings.monitoringActive else {
