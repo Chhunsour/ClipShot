@@ -3,12 +3,25 @@ import AppKit
 import CoreGraphics
 
 /// Service for discovering, highlighting, and capturing individual application windows.
+///
+/// ## macOS Window Server Architecture
+/// Queries the macOS Window Server via `CGWindowListCopyWindowInfo` to enumerate live window state.
+/// Filters windows by:
+/// - **Layer**: Normal window layer (`layer == 0`), excluding desktop icons, menu bars, and dock.
+/// - **Bounds**: Minimum size thresholds (>50x50 pt) to ignore hidden helper stubs.
+/// - **Ownership**: Excludes ClipShot's own transparent capture overlays to prevent recursive feedback.
+///
+/// Supports shadow inclusion via `.boundsIgnoreFraming` for clean, professional isolated window snapshots.
 public final class WindowCaptureService: @unchecked Sendable {
+    /// Shared singleton instance.
     public static let shared = WindowCaptureService()
 
+    /// Default public initializer.
     public init() {}
 
-    /// Returns a list of visible on-screen windows.
+    /// Returns an ordered list of visible on-screen application windows from front to back.
+    ///
+    /// - Returns: Array of `WindowInfo` structs representing visible top-level windows.
     public func getVisibleWindows() -> [WindowInfo] {
         guard let windowListInfo = CGWindowListCopyWindowInfo(
             [.optionOnScreenOnly, .excludeDesktopElements],
@@ -51,12 +64,20 @@ public final class WindowCaptureService: @unchecked Sendable {
     }
 
     /// Finds the top-most visible window under a given global coordinate point.
+    ///
+    /// - Parameter point: Global screen coordinate in Quartz points.
+    /// - Returns: The topmost matching `WindowInfo`, or `nil` if no window intersects the point.
     public func window(at point: CGPoint) -> WindowInfo? {
         let windows = getVisibleWindows()
         return windows.first { $0.bounds.contains(point) }
     }
 
-    /// Captures a specific window by its CGWindowID.
+    /// Captures an isolated snapshot of a specific window by its `CGWindowID`.
+    ///
+    /// - Parameters:
+    ///   - windowInfo: Metadata describing the target window.
+    ///   - includeShadow: `true` to preserve Apple's translucent drop shadow framing; `false` to clip tightly to window edges.
+    /// - Returns: High-resolution `NSImage` of the window, or rect fallback on failure.
     public func captureWindow(_ windowInfo: WindowInfo, includeShadow: Bool = true) -> NSImage? {
         var options: CGWindowImageOption = [.bestResolution]
         if !includeShadow {
