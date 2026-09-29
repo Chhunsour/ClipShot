@@ -91,6 +91,11 @@ Explore in-depth documentation guides for ClipShot:
 | **[Dark Mode & Contrast](docs/DARK_MODE_AND_CONTRAST.md)** | System appearance sync, vibrancy materials, and high-contrast WCAG rules. |
 | **[Terminal Path Security](docs/TERMINAL_PATH_PASTING_SECURITY.md)** | POSIX single-quote path escaping and shell injection prevention. |
 | **[Memory & Buffer Management](docs/MEMORY_MANAGEMENT_AND_AUTORELEASE.md)** | Autorelease pool scoping, ImageIO lazy reads, and ScreenCaptureKit frame limits. |
+| **[SMAppService Login Items](docs/MACOS_LAUNCH_AGENT_SMAPPSERVICE.md)** | Modern macOS 13+ launch-at-login integration, sandboxing, and state mapping. |
+| **[FSEvents Kernel Streams](docs/FSEVENTS_STREAM_INTERNALS.md)** | Microsecond event notifications, zero-polling CPU design, and wake recovery. |
+| **[Display P3 Wide Gamut](docs/WIDE_GAMUT_DISPLAY_P3.md)** | Wide color primaries, gamut coverage, and color profile preservation. |
+| **[Dynamic Spring Physics](docs/DYNAMIC_SPRING_PHYSICS.md)** | Harmonic oscillators, critically damped settling, and SwiftUI spring curves. |
+| **[Code Signing & Notarization](docs/CODE_SIGNING_AND_NOTARIZATION.md)** | Apple Developer ID, Hardened Runtime entitlements, and notarytool automation. |
 | **[Project Roadmap](docs/ROADMAP.md)** | Planned features, community requests, and architectural non-goals. |
 
 ---
