@@ -1,4 +1,5 @@
 import XCTest
+import ServiceManagement
 @testable import ClipShotCore
 
 final class LaunchAtLoginManagerTests: XCTestCase {
@@ -11,7 +12,6 @@ final class LaunchAtLoginManagerTests: XCTestCase {
     func testRefreshStatusDoesNotCrash() {
         let manager = LaunchAtLoginManager.shared
         manager.refreshStatus()
-        // In unbundled test runner environment, service status defaults to notRegistered (isEnabled = false)
-        XCTAssertFalse(manager.isEnabled)
+        XCTAssertEqual(manager.isEnabled, SMAppService.mainApp.status == .enabled)
     }
 }
