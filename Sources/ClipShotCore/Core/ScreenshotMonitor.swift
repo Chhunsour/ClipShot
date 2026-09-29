@@ -3,15 +3,28 @@ import CoreServices
 import AppKit
 
 /// Event-driven filesystem monitor using Apple's FSEvents framework.
+///
 /// Delivers zero-polling, negligible-CPU detection of screenshot directory events.
+/// Unlike legacy polling timers that repeatedly query directory listings, `ScreenshotMonitor`
+/// registers directly with the macOS kernel via `FSEventStreamCreate` to receive immediate
+/// asynchronous notifications whenever new files are written to the monitored directory.
 public final class ScreenshotMonitor: @unchecked Sendable {
+    /// Shared singleton monitor instance.
     public static let shared = ScreenshotMonitor()
 
+    /// Opaque reference to the active CoreServices FSEvent stream.
     private var streamRef: FSEventStreamRef?
+
+    /// Dedicated user-initiated serial dispatch queue processing incoming filesystem event callbacks.
     private let queue = DispatchQueue(label: "com.clipshot.fsevents", qos: .userInitiated)
+
+    /// Internal tracking flag indicating active stream execution.
     private var isMonitoring: Bool = false
+
+    /// Standardized file path of the currently monitored folder.
     private var currentMonitoredPath: String?
 
+    /// Initializes monitor and attaches workspace wake-from-sleep lifecycle observers.
     public init() {
         setupWakeNotification()
     }
@@ -23,6 +36,9 @@ public final class ScreenshotMonitor: @unchecked Sendable {
     // MARK: - Lifecycle
 
     /// Starts or restarts monitoring on the active screenshot directory.
+    ///
+    /// Validates directory existence on disk, checks if already monitoring the identical path,
+    /// tears down any existing stream, and starts a fresh low-latency FSEvent stream.
     public func start() {
         let folderURL = PathUtils.shared.activeScreenshotFolder()
         let path = folderURL.path
@@ -44,7 +60,10 @@ public final class ScreenshotMonitor: @unchecked Sendable {
         AppLogger.shared.info("Started FSEvents monitoring on: \(path)")
     }
 
-    /// Stops monitoring the filesystem.
+    /// Stops monitoring the filesystem and releases underlying CoreServices stream resources.
+    ///
+    /// Executes `FSEventStreamStop`, `FSEventStreamInvalidate`, and `FSEventStreamRelease` to
+    /// prevent CoreServices memory leaks.
     public func stop() {
         guard let stream = streamRef else { return }
         FSEventStreamStop(stream)
@@ -55,7 +74,7 @@ public final class ScreenshotMonitor: @unchecked Sendable {
         AppLogger.shared.info("Stopped FSEvents monitoring")
     }
 
-    /// Restarts monitoring (e.g. when directory setting changes).
+    /// Restarts monitoring (e.g. when directory setting changes or system wakes from sleep).
     public func restart() {
         stop()
         start()
@@ -64,7 +83,13 @@ public final class ScreenshotMonitor: @unchecked Sendable {
     // MARK: - Private FSEvents Setup
 
     /// Configures and starts the low-latency FSEventStream on a background dispatch queue.
-    /// Uses kFSEventStreamCreateFlagFileEvents for file-level granular notifications.
+    ///
+    /// Flags used:
+    /// - `kFSEventStreamCreateFlagUseCFTypes`: Passes paths as native CFArray of CFStrings.
+    /// - `kFSEventStreamCreateFlagFileEvents`: Requests fine-grained file-level rather than directory-level notifications.
+    /// - `kFSEventStreamCreateFlagNoDefer`: Delivers events immediately without batching delays.
+    ///
+    /// - Parameter path: Normalized directory path to watch.
     private func startFSEventStream(for path: String) {
         var context = FSEventStreamContext(
             version: 0,
@@ -106,6 +131,11 @@ public final class ScreenshotMonitor: @unchecked Sendable {
     }
 
     /// Processes batch filesystem events and dispatches created/renamed file URLs to ScreenshotProcessor.
+    ///
+    /// Inspects bitwise flags for:
+    /// - `kFSEventStreamEventFlagItemCreated`: Newly created screenshot files.
+    /// - `kFSEventStreamEventFlagItemRenamed`: Files moved into the folder or renamed by macOS screencapture daemon.
+    /// - `kFSEventStreamEventFlagItemModified`: Content writes completing on disk.
     private func handleEvents(paths: UnsafeMutableRawPointer, flags: UnsafePointer<FSEventStreamEventFlags>, count: Int) {
         guard let pathArray = unsafeBitCast(paths, to: NSArray.self) as? [String] else { return }
 
