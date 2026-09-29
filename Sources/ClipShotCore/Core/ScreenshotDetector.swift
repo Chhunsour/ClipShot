@@ -3,10 +3,20 @@ import CoreServices
 import ImageIO
 
 /// Identifies whether a newly detected file in the monitored directory is a valid macOS screenshot.
+///
+/// Implements a multi-stage classification pipeline designed for high performance and low CPU overhead:
+/// 1. **Extension Filter**: Quick rejection of non-image files (.pdf, .txt, .mp4).
+/// 2. **Detection Mode Strategy**: If configured for `.allImages`, accepts any new image within the time window.
+/// 3. **Fast-Path Regex/Prefix Matching**: Microsecond pattern evaluation across 26+ macOS localization prefixes
+///    and timestamp formats without IPC overhead.
+/// 4. **Spotlight Metadata Fallback**: Queries `MDItem` for Apple's system-level `kMDItemIsScreenCapture` attribute
+///    if filename matching is ambiguous.
+/// 5. **Temporal Age Filter**: Rejects historical images by enforcing sensitivity-based creation window limits.
 public final class ScreenshotDetector: Sendable {
+    /// Shared singleton instance for stateless screenshot identification.
     public static let shared = ScreenshotDetector()
 
-    // Standard localized prefix patterns used by macOS for screenshots across languages
+    /// Standard localized prefix patterns used by macOS for screenshots across 26+ system languages.
     private static let screenshotPrefixes: [String] = [
         "screen shot",
         "screenshot",
@@ -36,9 +46,15 @@ public final class ScreenshotDetector: Sendable {
         "simulator screenshot"
     ]
 
+    /// Default public initializer.
     public init() {}
 
     /// Determines whether the file at the given URL is a screenshot according to current settings.
+    ///
+    /// - Parameters:
+    ///   - url: The file URL on disk to evaluate.
+    ///   - settings: Application configuration controlling sensitivity and detection modes.
+    /// - Returns: `true` if the candidate file is confirmed as an active screenshot; otherwise `false`.
     public func isScreenshot(url: URL, settings: AppSettings = .shared) -> Bool {
         // 1. Verify file exists and has a supported image extension
         guard ImageUtils.isImageFile(at: url) else { return false }
@@ -65,7 +81,10 @@ public final class ScreenshotDetector: Sendable {
         return false
     }
 
-    /// Checks Spotlight MDItem metadata for `kMDItemIsScreenCapture`.
+    /// Checks Spotlight MDItem metadata for Apple's system attribute `kMDItemIsScreenCapture`.
+    ///
+    /// - Parameter url: The file URL to inspect.
+    /// - Returns: Optional boolean indicating system screen capture flag if present in Spotlight store.
     public func checkMDItemIsScreenCapture(url: URL) -> Bool? {
         guard let mdItem = MDItemCreateWithURL(kCFAllocatorDefault, url as CFURL) else {
             return nil
@@ -78,7 +97,10 @@ public final class ScreenshotDetector: Sendable {
         return nil
     }
 
-    /// Checks if a filename matches standard macOS screenshot naming conventions.
+    /// Checks if a filename matches standard macOS screenshot naming conventions and patterns.
+    ///
+    /// - Parameter filename: Filename including extension (e.g. "Screen Shot 2026-09-29 at 09.30.00.png").
+    /// - Returns: `true` if matching known localized prefixes or ISO/macOS date structures.
     public func matchesScreenshotNamingPattern(filename: String) -> Bool {
         let lower = filename.lowercased()
 
@@ -98,7 +120,12 @@ public final class ScreenshotDetector: Sendable {
         return false
     }
 
-    /// Checks if the file was created or modified recently.
+    /// Checks if the file was created or modified recently within the specified time window.
+    ///
+    /// - Parameters:
+    ///   - path: POSIX file path.
+    ///   - maxAge: Maximum elapsed time in seconds since file creation or modification.
+    /// - Returns: `true` if creation or modification timestamp is within `maxAge`.
     public func isRecentlyCreated(path: String, maxAge: TimeInterval) -> Bool {
         guard let attrs = try? FileManager.default.attributesOfItem(atPath: path) else {
             return false
@@ -118,6 +145,7 @@ public final class ScreenshotDetector: Sendable {
         return false
     }
 
+    /// Maps user detection sensitivity setting to maximum allowed elapsed file age.
     private func maxAge(for sensitivity: DetectionSensitivity) -> TimeInterval {
         switch sensitivity {
         case .strict: return 60.0
