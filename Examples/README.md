@@ -42,6 +42,13 @@ This directory provides standalone executable Swift scripts, reference patterns,
 | [`calculate_pixel_density.swift`](calculate_pixel_density.swift) | Mac display PPI, physical diagonal, and Retina scale factors | Retina Coordinate Math |
 | [`inspect_pasteboard_flavors.swift`](inspect_pasteboard_flavors.swift) | Multi-flavor NSPasteboard item inspection and consumer extraction | `ClipboardManager` |
 | [`simulate_color_quantization.swift`](simulate_color_quantization.swift) | Uniform box color quantization and dominant centroid extraction | Palette Extraction |
+| [`calculate_retina_point_grid.swift`](calculate_retina_point_grid.swift) | Retina subpixel point grid snapping and hairline alignment calculator | Retina & Geometry |
+| [`benchmark_string_drawing_cache.swift`](benchmark_string_drawing_cache.swift) | Dimension string measurement caching and layout benchmark | UI Performance |
+| [`simulate_history_lru_eviction.swift`](simulate_history_lru_eviction.swift) | Screenshot history LRU thumbnail buffer eviction simulation | Cache & Memory |
+| [`inspect_color_luminance_thresholds.swift`](inspect_color_luminance_thresholds.swift) | WCAG 2.1 relative luminance and contrast ratio analyzer | Accessibility |
+| [`simulate_notch_autocollapse.swift`](simulate_notch_autocollapse.swift) | ClipNotch auto-collapse state machine and timer cooldown simulation | `ClipNotch` Interactions |
+| [`format_exif_timestamp.swift`](format_exif_timestamp.swift) | EXIF and TIFF timestamp normalization and ISO-8601 formatting | Metadata & ImageIO |
+| [`simulate_bitmap_crop_bounds.swift`](simulate_bitmap_crop_bounds.swift) | Boundary-safe bitmap cropping math and scale transformation | Image Processing |
 
 ---
 
@@ -50,21 +57,19 @@ This directory provides standalone executable Swift scripts, reference patterns,
 All scripts in this directory are self-contained executable Swift scripts using `#!/usr/bin/env swift`. Run them from the repository root:
 
 ```bash
-swift Examples/detect_localized_screenshots.swift
-swift Examples/calculate_memory_budget.swift
-swift Examples/simulate_spring_physics.swift
-swift Examples/inspect_display_gamut.swift
-swift Examples/benchmark_regex_matching.swift
-swift Examples/simulate_key_debounce.swift
-swift Examples/format_duration_string.swift
-swift Examples/calculate_pixel_density.swift
-swift Examples/inspect_pasteboard_flavors.swift
-swift Examples/simulate_color_quantization.swift
+swift Examples/calculate_retina_point_grid.swift
+swift Examples/benchmark_string_drawing_cache.swift
+swift Examples/simulate_history_lru_eviction.swift
+swift Examples/inspect_color_luminance_thresholds.swift
+swift Examples/simulate_notch_autocollapse.swift
+swift Examples/format_exif_timestamp.swift
+swift Examples/simulate_bitmap_crop_bounds.swift
 ```
 
-To validate all 34 examples in sequence:
+To validate all 41 examples in sequence:
 ```bash
 for script in Examples/*.swift; do
     swift "$script" > /dev/null || exit 1
 done
 ```
+

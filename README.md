@@ -96,6 +96,8 @@ Explore in-depth documentation guides for ClipShot:
 | **[Display P3 Wide Gamut](docs/WIDE_GAMUT_DISPLAY_P3.md)** | Wide color primaries, gamut coverage, and color profile preservation. |
 | **[Dynamic Spring Physics](docs/DYNAMIC_SPRING_PHYSICS.md)** | Harmonic oscillators, critically damped settling, and SwiftUI spring curves. |
 | **[Code Signing & Notarization](docs/CODE_SIGNING_AND_NOTARIZATION.md)** | Apple Developer ID, Hardened Runtime entitlements, and notarytool automation. |
+| **[Retina Subpixel Snapping](docs/RETINA_SUBPIXEL_SNAPPING.md)** | Subpixel point grid snapping, 0.5pt hairline alignment, and anti-aliasing. |
+| **[Pasteboard Security Architecture](docs/PASTEBOARD_METADATA_SECURITY.md)** | NSPasteboard privacy flags, ConcealedType handling, and credential isolation. |
 | **[Project Roadmap](docs/ROADMAP.md)** | Planned features, community requests, and architectural non-goals. |
 
 ---
