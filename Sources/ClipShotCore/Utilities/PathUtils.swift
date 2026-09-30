@@ -1,17 +1,27 @@
 import Foundation
 import AppKit
 
-/// Utilities for detecting and managing macOS screenshot folder locations and security bookmarks.
+/// Utilities for detecting, validating, and managing macOS screenshot folder locations,
+/// sandboxed file system security bookmarks, and user directory defaults.
+///
+/// Under macOS App Sandbox restrictions, file access outside standard application container
+/// boundaries requires persistent security-scoped bookmarks granted via user consent (`NSOpenPanel`).
+/// This utility coordinates bookmark retrieval, resolution, stale bookmark detection, and fallback
+/// to native `com.apple.screencapture` preference domains.
 public final class PathUtils: @unchecked Sendable {
+    /// Shared singleton instance for thread-safe path resolution and preference synchronization.
     public static let shared = PathUtils()
 
     /// Returns the active screenshot directory based on system defaults or user preference.
     ///
     /// Resolution Order:
     /// 1. Security-scoped bookmark from user preferences (if configured and valid).
-    /// 2. User-configured custom folder path expanded from tilde.
-    /// 3. macOS system screenshot directory from `com.apple.screencapture location`.
-    /// 4. Fallback to `~/Desktop`.
+    ///    Calls `startAccessingSecurityScopedResource()` to activate the sandbox access grant.
+    /// 2. User-configured custom folder path expanded from tilde (if accessible without sandbox restriction).
+    /// 3. macOS system screenshot directory read directly from `com.apple.screencapture location`.
+    /// 4. Fallback to `~/Desktop` in the current user domain.
+    ///
+    /// - Returns: A validated, reachable `URL` pointing to the designated screenshot folder.
     public func activeScreenshotFolder() -> URL {
         let settings = AppSettings.shared
 
