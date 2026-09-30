@@ -49,7 +49,18 @@ public enum ImageUtils {
         return status == .statusComplete
     }
 
-    /// Generates a downscaled thumbnail NSImage and saves it to disk cache.
+    /// Generates a downscaled thumbnail NSImage directly via ImageIO hardware acceleration.
+    ///
+    /// Key ImageIO options utilized:
+    /// - `kCGImageSourceCreateThumbnailFromImageAlways`: Guarantees generation even if embedded thumbnail is absent.
+    /// - `kCGImageSourceShouldCacheImmediately`: Decodes directly into graphics memory to prevent UI hitching on draw.
+    /// - `kCGImageSourceCreateThumbnailWithTransform`: Respects EXIF camera orientation tags automatically.
+    /// - `kCGImageSourceThumbnailMaxPixelSize`: Constrains the longest dimension while preserving aspect ratio.
+    ///
+    /// - Parameters:
+    ///   - url: File system URL of the source image.
+    ///   - maxDimension: Maximum allowable width or height in physical pixels (defaults to 300).
+    /// - Returns: Renderable `NSImage` sized to thumbnail dimensions, or `nil` if decoding failed.
     public static func generateThumbnail(from url: URL, maxDimension: CGFloat = 300) -> NSImage? {
         guard let source = CGImageSourceCreateWithURL(url as CFURL, nil) else { return nil }
 
@@ -101,7 +112,18 @@ public enum ImageUtils {
         try data.write(to: destinationURL, options: .atomic)
     }
 
-    /// Applies a box blur or pixelation effect to a specific rectangular region of a CGImage.
+    /// Applies a Gaussian blur privacy redaction filter to a specific rectangular region of a CGImage.
+    ///
+    /// The redaction pipeline:
+    /// 1. Converts input `CGImage` to `CIImage` coordinate space.
+    /// 2. Applies `CIGaussianBlur` with a 15.0 pt blur radius.
+    /// 3. Renders the blurred output via `CIContext`.
+    /// 4. Composites the blurred region atop the crisp original using CoreGraphics clipping context (`clip(to: rect)`).
+    ///
+    /// - Parameters:
+    ///   - image: Source bitmap to redact.
+    ///   - rect: Pixel-aligned rectangular bounding box to blur.
+    /// - Returns: Newly allocated `CGImage` containing the selectively redacted image, or `nil` on failure.
     public static func blurRegion(in image: CGImage, rect: CGRect) -> CGImage? {
         let ciImage = CIImage(cgImage: image)
         guard let filter = CIFilter(name: "CIGaussianBlur") else { return nil }
