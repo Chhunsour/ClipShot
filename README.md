@@ -98,6 +98,7 @@ Explore in-depth documentation guides for ClipShot:
 | **[Code Signing & Notarization](docs/CODE_SIGNING_AND_NOTARIZATION.md)** | Apple Developer ID, Hardened Runtime entitlements, and notarytool automation. |
 | **[Retina Subpixel Snapping](docs/RETINA_SUBPIXEL_SNAPPING.md)** | Subpixel point grid snapping, 0.5pt hairline alignment, and anti-aliasing. |
 | **[Pasteboard Security Architecture](docs/PASTEBOARD_METADATA_SECURITY.md)** | NSPasteboard privacy flags, ConcealedType handling, and credential isolation. |
+| **[ImageIO Thumbnail Pipeline](docs/IMAGEIO_THUMBNAIL_PIPELINE.md)** | Hardware downsampling, zero-decoding dimensions, and memory budgets. |
 | **[Project Roadmap](docs/ROADMAP.md)** | Planned features, community requests, and architectural non-goals. |
 
 ---

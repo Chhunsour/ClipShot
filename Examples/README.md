@@ -49,6 +49,7 @@ This directory provides standalone executable Swift scripts, reference patterns,
 | [`simulate_notch_autocollapse.swift`](simulate_notch_autocollapse.swift) | ClipNotch auto-collapse state machine and timer cooldown simulation | `ClipNotch` Interactions |
 | [`format_exif_timestamp.swift`](format_exif_timestamp.swift) | EXIF and TIFF timestamp normalization and ISO-8601 formatting | Metadata & ImageIO |
 | [`simulate_bitmap_crop_bounds.swift`](simulate_bitmap_crop_bounds.swift) | Boundary-safe bitmap cropping math and scale transformation | Image Processing |
+| [`benchmark_imageio_thumbnail.swift`](benchmark_imageio_thumbnail.swift) | Hardware-accelerated ImageIO thumbnail downsampling benchmark | `ImageIO`, Performance |
 
 ---
 
