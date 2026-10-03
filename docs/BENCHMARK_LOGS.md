@@ -19,3 +19,4 @@ This log automatically records verified execution passes and benchmarks across t
 | 2026-10-03 08:50:12Z | Clipboard History LRU Thumbnail Buffer Eviction Order | Passed ✅ | arm64 |
 | 2026-10-03 08:53:24Z | Apple Vision Neural OCR Candidate Confidence Filtering | Passed ✅ | arm64 |
 | 2026-10-03 08:56:36Z | Color Quantization Box Centroid Calculation | Passed ✅ | arm64 |
+| 2026-10-03 08:59:48Z | Boundary-Safe Bitmap Crop Coordinate Transform | Passed ✅ | arm64 |
