@@ -59,3 +59,4 @@ This log automatically records verified execution passes and benchmarks across t
 | 2026-10-03 10:58:12Z | Subpixel Antialiasing Alignment for 0.5pt Guides | Passed ✅ | arm64 |
 | 2026-10-03 11:01:24Z | Async File Writer Thread Contention Benchmark | Passed ✅ | arm64 |
 | 2026-10-03 11:04:36Z | Clipboard Image Data Detector URL Parsing | Passed ✅ | arm64 |
+| 2026-10-03 11:07:48Z | CoreImage Gaussian Blur Redaction Shader Throughput | Passed ✅ | arm64 |
