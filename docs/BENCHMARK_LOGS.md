@@ -71,3 +71,4 @@ This log automatically records verified execution passes and benchmarks across t
 | 2026-10-05 08:18:00Z | ScreenCaptureKit Stream Frame Latency | Passed ✅ | arm64 |
 | 2026-10-05 08:22:00Z | ImageIO HEIC Compression Throughput | Passed ✅ | arm64 |
 | 2026-10-05 08:26:00Z | Retina 2x Subpixel Text Rasterization | Passed ✅ | arm64 |
+| 2026-10-05 08:30:00Z | Multi-Window Shadow Clipping Detection | Passed ✅ | arm64 |
