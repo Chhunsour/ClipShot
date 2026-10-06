@@ -89,3 +89,4 @@ This log automatically records verified execution passes and benchmarks across t
 | 2026-10-06 08:00:30Z | OCR Text Candidate Preserved Bounding Boxes | Passed ✅ | arm64 |
 | 2026-10-06 08:03:20Z | POSIX File Security Bookmark Re-Validation | Passed ✅ | arm64 |
 | 2026-10-06 08:06:10Z | History Thumbnail Disk IO Cache Warmup Throughput | Passed ✅ | arm64 |
+| 2026-10-06 08:09:00Z | Carbon Hotkey Event Loop Debounce Duration | Passed ✅ | arm64 |
